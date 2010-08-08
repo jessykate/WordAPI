@@ -97,7 +97,7 @@ def get_url(url):
     return fp.read()
     
 
-def tokenize(body, tokenizer=None, strip='true'):    
+def tokenize(body, tokenizer=None, strip='true', normalize=True, remove_stopwords = True):    
     if strip.lower() != 'false':
         body = nltk.clean_html(body)        
         
@@ -117,6 +117,13 @@ def tokenize(body, tokenizer=None, strip='true'):
         resp.write(": Tokenizer parameter must be a valid regular expression.")
         return resp
     tokens = tknizr.tokenize(body)
+    if normalize:
+        tokens = [token.lower() for token in tokens] 
+    if remove_stopwords:
+        stopwords = nltk.corpus.stopwords.words('english')
+        # call lower() on each token because we can't be sure the tokens are
+        # normalized. 
+        tokens = [token for token in tokens if token.lower() not in stopwords]
     return tokens
 
 def _tup_cmp(t1, t2):
@@ -266,7 +273,7 @@ class TagCloudHandler(GeneralHandler):
 	strip existing html. ''' 
     allowed_methods = ('GET', 'POST')
     args_required = ['body']
-    args_optional = ['tokenizer', 'strip', 'max_words',
+    args_optional = ['tokenizer', 'strip', 'max_words', 'normalize', 'remove_stopwords',
                      # width and height of the div returned
                      'width', 'height', 
                      # scaling factors for largest and smallest words
@@ -279,6 +286,10 @@ class TagCloudHandler(GeneralHandler):
             tokenizer_opts['tokenizer'] = self.kwargs['tokenizer']
         if 'strip' in self.kwargs.keys():
             tokenizer_opts['strip'] = self.kwargs['strip']        
+        if 'remove_stopwords' in self.kwargs.keys():
+            tokenizer_opts['remove_stopwords'] = self.kwargs['remove_stopwords']        
+        if 'normalize' in self.kwargs.keys():
+            tokenizer_opts['normalize'] = self.kwargs['normalize']        
         tokens =  tokenize(self.fargs[0], **tokenizer_opts )
         freq = nltk.FreqDist(tokens)
 
