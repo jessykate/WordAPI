@@ -163,8 +163,6 @@ def tag_cloud(dist, id_ = "", class_ = "", width="400", height=None,
     defalt styling for the tag cloud, while body contains the html
     markup. '''
 
-    print min_size
-    print max_size
     # sort() returns a list of tuples in order of decreasing frequency 
     dist = sort(dist) 
     # explicitly set the indices where the min and max values can be found in
@@ -194,7 +192,7 @@ def tag_cloud(dist, id_ = "", class_ = "", width="400", height=None,
         body += '''<span class="word %s">%s</span> ''' % (num_to_word(freq),
         word)
     body += '''</div>'''
-    print body
+    #print body
 
     # get the equation of the line between min_size and max_size:
     # y = mx+b --> max_size = m*max_freq + b, min_size = m*min_freq + b.
@@ -227,8 +225,8 @@ def tag_cloud(dist, id_ = "", class_ = "", width="400", height=None,
         print size(f)
     style += '''
 </style>'''
-    print 'style portion'
-    print style
+    #print 'style portion'
+    #print style
   
     return {'body': body, 'style': style}
 
