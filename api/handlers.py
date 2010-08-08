@@ -301,6 +301,19 @@ class TagCloudHandler(GeneralHandler):
 class DiffHandler(GeneralHandler):
 	pass
 
+
+class TopWordComparisonHandler(GeneralHandler):
+    ''' takes the top N most frequent words in two documents and says which
+    ones are shared between the two.''' 
+    pass
+
+class FeedPhraseDetectionHandler(GeneralHandler):
+    ''' Lets the user register a url or feed to be checked regularly for a
+    specified phrase.''' 
+    pass
+
+# let the user register a call back when something is triggered. 
+
 def keyword_match():
 	''' similarity can be computed by asking which other documents share the
 	most words with this document (poor man's topic detection) or how
@@ -310,9 +323,15 @@ def keyword_match():
 	pass
 
 def diff(doca, docb):
-	''' identifies sections which have been aded or removed from doca in
-	docb. returns a set of tuples with the section and whether it was added
-	or deleted.'''
+    ''' accepts doca and docb as strings. identifies sections which have been
+    added or removed from doca in docb. returns a set of tuples with the
+    section and whether it was added or deleted.'''
+    
+    num_characters = max([len(doca), len(docb)]) 
+    for i in num_characters:
+        diffs = []
+        if doca[i] != docb[i]:
+            diffs.append(i)
 	pass
 
 def percent_different(doca,docb, unit="words"):
