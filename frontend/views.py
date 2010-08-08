@@ -98,12 +98,10 @@ def tagcloud_submit(request):
     # probably validate tokenizer regular expressions etc. 
     if form.is_valid(): 
         data = form.cleaned_data
-        raw_input("waiting for you to hit enter...")
         args = {}
         for field, value in data.iteritems():
             if value:
                 args[field] = value
-        print args
 
         url = settings.ROOT_URL + "/api/1.0/tagcloud/json"
         headers = {'Content-type': 'application/x-www-form-urlencoded'}
@@ -124,5 +122,14 @@ def tagcloud_submit(request):
         return render_to_response('frontend/tagcloud_display.html', {'body' : body,
                                     'style' : style})
 
+
+    else:
+        print request.POST
+        print 'Form did not validate'
+        form = TagCloudForm(request.POST)
+        return render_to_response('frontend/tagcloud.html', 
+                                    {'domain': settings.ROOT_URL,
+                                    'tagcloud_form' : form
+                                    })
 
 

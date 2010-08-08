@@ -29,7 +29,7 @@ class GeneralHandler(BaseHandler):
         respectively. then calls the execute function, which must be
         implemented by the child class and calls the main work
         function of the handler.'''
-	print 'in "read"'
+        print 'in "read"'
         self.fargs = []
         for arg in self.args_required:
             if not request.GET.get(arg, None):
@@ -172,8 +172,9 @@ def tag_cloud(dist, id_ = "", class_ = "", width="400", height=None,
 
     # truncate the list of items if max_words was specified
     if max_words:
+        max_words = int(max_words)
         dist = dist[:max_words]            
-        
+
     # assemble the class and id tags for the tag cloud's wrapping div 
     divstyle = '''class="tagcloud"'''
     if class_ != "": divstyle = divstyle[:-1] + " " + class_ + ''' "'''
@@ -203,9 +204,7 @@ def tag_cloud(dist, id_ = "", class_ = "", width="400", height=None,
     max_size = float(max_size)
     min_size = float(min_size)
     m = (max_size - min_size)/(max_freq - min_freq)
-    print "m = %f" % m
     b = max_size - m*max_freq
-    print "b = %f" % b
     size = lambda freq: m*freq+b
 
     # get the distinct frequencies and specify a font-size for each that
@@ -221,8 +220,6 @@ def tag_cloud(dist, id_ = "", class_ = "", width="400", height=None,
         freq_word = num_to_word(f)
     	style += '''
 .%s {padding-left: 15px; padding-right: 15px; font-size: %s; }''' % (freq_word, size(f))
-        print f
-        print size(f)
     style += '''
 </style>'''
     #print 'style portion'
@@ -269,14 +266,13 @@ class TagCloudHandler(GeneralHandler):
 	strip existing html. ''' 
     allowed_methods = ('GET', 'POST')
     args_required = ['body']
-    args_optional = ['tokenizer', 'strip', 
+    args_optional = ['tokenizer', 'strip', 'max_words',
                      # width and height of the div returned
                      'width', 'height', 
                      # scaling factors for largest and smallest words
                      'max_size', 'min_size']
 
     def execute(self):
-        print 'max_size'
         print self.kwargs
         tokenizer_opts = {}
         if 'tokenizer' in self.kwargs.keys():
@@ -295,6 +291,8 @@ class TagCloudHandler(GeneralHandler):
             cloud_opts['max_size'] = self.kwargs['max_size']                
         if 'min_size' in self.kwargs.keys():
             cloud_opts['min_size'] = self.kwargs['min_size']                
+        if 'max_words' in self.kwargs.keys():
+            cloud_opts['max_words'] = self.kwargs['max_words']                
         cloud = tag_cloud(freq, **cloud_opts)
 	return cloud # json.dumps(cloud)
 
