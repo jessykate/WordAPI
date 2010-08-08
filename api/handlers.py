@@ -210,13 +210,13 @@ def tag_cloud(dist, id_ = "", class_ = "", width="400", height=None,
 
     # get the distinct frequencies and specify a font-size for each that
     # corresponds to its size 
-    # TODO how to handle colours for each word?
+    # TODO colours!
     # TODO often each tag is a link to a category list or something else...
     freqs = []
     for f in [x[1] for x in dist]: 
 	if f not in freqs: freqs.append(f)
     style = '''<style>
-.tagcloud {width: %s; height: %s;}''' % (width, height)
+.tagcloud {width: %s; height: %s; text-align: center; }''' % (width, height)
     for f in freqs:
         freq_word = num_to_word(f)
     	style += '''
