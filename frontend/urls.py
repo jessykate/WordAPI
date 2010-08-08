@@ -3,7 +3,8 @@ from piston.resource import Resource
 from wordapi.frontend.views import *
 
 urlpatterns = patterns('',
-  url(r'^tagcloud$', TagCloud),
+  url(r'^tagcloud$', tagcloud),
+  url(r'^tagcloudsubmit', tagcloud_submit),
   url(r'^$', Index),
 
 )
