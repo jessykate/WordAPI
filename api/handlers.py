@@ -1,7 +1,7 @@
 from piston.handler import BaseHandler
 from piston.utils import rc
 import nltk, urllib, urllib2
-import urllib
+import urllib, random
 try:
     import json
 except:
@@ -46,8 +46,8 @@ class GeneralHandler(BaseHandler):
 		thisarg = urllib.unquote_plus(request.GET.get(arg))
                 self.kwargs[arg] = thisarg
 
-        print 'kwargs:'
-        print self.kwargs
+        #print 'kwargs:'
+        #print self.kwargs
         # each handler defines an 'execute' function that calls the
         # main work function with arguments stored in the class
         # attributes. might simply call some other function, or can
@@ -79,14 +79,15 @@ class GeneralHandler(BaseHandler):
                 thisarg = urllib.unquote_plus(request.POST.get(arg))
                 self.kwargs[arg] = thisarg
 
+        #print 'kwargs'
+        #print self.kwargs
+        #print ''
+        #print 'fargs'
+        #print self.fargs
+
         # each handler defines an 'execute' function that calls the
         # main work function with arguments stored in the class
         # attributes
-        print 'kwargs'
-        print self.kwargs
-        print ''
-        print 'fargs'
-        print self.fargs
         return self.execute()
 
 
@@ -164,8 +165,22 @@ def num_to_word(freq):
     return wordstring
 
 
+def color_scheme(color_a=None, color_b=None, num_colors=5):
+    ''' This function is just a stub for now, but it should have a series of
+    colour schemes to select randomly from, or be able to extrapolate between
+    two values to return a custom colour scheme. ''' 
+    
+    default_palette = ["#FF6600", "#CC6626", "#99664D", "#666673", "#336699"]
+
+    # if no colours are specified, return a random colour scheme. 
+    if not color_a or not color_b:
+        return default_palette
+    else:
+        return default_palette
+         
+
 def tag_cloud(dist, id_ = "", class_ = "", width="400", height=None, 
-              max_size=20, min_size=10, max_words = None):
+              max_size=70, min_size=10, max_words = None, sort_order="random"):
     ''' returns a dict with style and body elements. style contains
     defalt styling for the tag cloud, while body contains the html
     markup. '''
@@ -182,27 +197,9 @@ def tag_cloud(dist, id_ = "", class_ = "", width="400", height=None,
         max_words = int(max_words)
         dist = dist[:max_words]            
 
-    # assemble the class and id tags for the tag cloud's wrapping div 
-    divstyle = '''class="tagcloud"'''
-    if class_ != "": divstyle = divstyle[:-1] + " " + class_ + ''' "'''
-    # the user can specify a unique id for the tag cloud if they want
-    # additional styling applied from their own style sheets. 
-    if id_ != "": divstyle += ''' id="%s" ''' % id_
-    divstyle = divstyle.strip()	  
+    # get the equation of the line between min_size and max_size. do this AFTER
+    # truncating to max_words and BEFORE shuffling the order around.  
 
-    body = '''<div %s>''' % divstyle
-    for word, freq in dist:
-	# each word has a class of 'word' in addition to its frequency so that
-	# the user may specify additional styling
-
-    # note: make sure the space after the span is maintained; otherwise the
-    # spans within the div won't wrap. 
-        body += '''<span class="word %s">%s</span> ''' % (num_to_word(freq),
-        word)
-    body += '''</div>'''
-    #print body
-
-    # get the equation of the line between min_size and max_size:
     # y = mx+b --> max_size = m*max_freq + b, min_size = m*min_freq + b.
     # max_size - min_size = m (max_freq - min_freq) 
     # --> m = (max_size - min_size)/(max_freq - min_freq)
@@ -212,21 +209,60 @@ def tag_cloud(dist, id_ = "", class_ = "", width="400", height=None,
     min_size = float(min_size)
     m = (max_size - min_size)/(max_freq - min_freq)
     b = max_size - m*max_freq
-    size = lambda freq: m*freq+b
+    font_size = lambda freq: m*freq+b
 
-    # get the distinct frequencies and specify a font-size for each that
-    # corresponds to its size 
-    # TODO colours!
-    # TODO often each tag is a link to a category list or something else...
+    # determine the sort order. if the sort order is frequency, there's nothing
+    # to do since the distribution object is already sorted by frequency. 
+    if sort_order not in ['random', 'frequency', 'alphabetical']:
+        print 'invalid sort orderi; using default = random'
+        sort_order = 'random'
+
+    if sort_order == 'random':
+        # shuffles in place
+        random.shuffle(dist)
+
+    if sort_order == 'alphabetical':
+        # not yet implemented 
+        pass
+    
+    # assemble the class and id tags for the tag cloud's wrapping div 
+    divstyle = '''class="tagcloud"'''
+    if class_ != "": 
+        divstyle = divstyle[:-1] + " " + class_ + ''' "'''
+    
+    # the user can specify a unique id for the tag cloud if they want
+    # additional styling applied from their own style sheets. 
+    if id_ != "": divstyle += ''' id="%s" ''' % id_
+    divstyle = divstyle.strip()	  
+
+    body = '''<div %s>''' % divstyle
+    for word, freq in dist:
+        # each word has a class of 'word' in addition to its frequency so that
+        # the user may specify additional styling. **note**: make sure the
+        # space after the span is maintained; otherwise the spans within the
+        # div won't wrap. 
+        body += '''<span class="word %s">%s</span> ''' % (num_to_word(freq), word)
+    body += '''</div>'''
+    #print body
+
+    num_colors = 5
+    colors = color_scheme(num_colors=num_colors)
+
+    # get the distinct frequencies and specify a font-size and color for each,
+    # that corresponds to its size 
     freqs = []
     for f in [x[1] for x in dist]: 
-	if f not in freqs: freqs.append(f)
+        if f not in freqs: freqs.append(f)
     style = '''<style>
-.tagcloud {width: %s; height: %s; text-align: center; }''' % (width, height)
+.tagcloud {width: %s; height: %s; text-align: center; }
+.word { text-align: center; vertical-align: middle; } ''' % (width, height)
     for f in freqs:
-        freq_word = num_to_word(f)
-    	style += '''
-.%s {padding-left: 15px; padding-right: 15px; font-size: %s; }''' % (freq_word, size(f))
+        freq_as_word = num_to_word(f)
+        color_index = f % num_colors
+        color = colors[color_index]
+    	style += ('''
+.%s {padding-left: 15px; padding-right: 15px; font-size: %s; color: %s }''' 
+% (freq_as_word, font_size(f), color))
     style += '''
 </style>'''
     #print 'style portion'
@@ -273,14 +309,15 @@ class TagCloudHandler(GeneralHandler):
 	strip existing html. ''' 
     allowed_methods = ('GET', 'POST')
     args_required = ['body']
-    args_optional = ['tokenizer', 'strip', 'max_words', 'normalize', 'remove_stopwords',
+    args_optional = ['tokenizer', 'strip', 'max_words', 'normalize', 
+                      'remove_stopwords', 'sort_order',
                      # width and height of the div returned
                      'width', 'height', 
                      # scaling factors for largest and smallest words
                      'max_size', 'min_size']
 
     def execute(self):
-        print self.kwargs
+        #print self.kwargs
         tokenizer_opts = {}
         if 'tokenizer' in self.kwargs.keys():
             tokenizer_opts['tokenizer'] = self.kwargs['tokenizer']
@@ -304,6 +341,9 @@ class TagCloudHandler(GeneralHandler):
             cloud_opts['min_size'] = self.kwargs['min_size']                
         if 'max_words' in self.kwargs.keys():
             cloud_opts['max_words'] = self.kwargs['max_words']                
+        if 'sort_order' in self.kwargs.keys():
+            cloud_opts['sort_order'] = self.kwargs['sort_order']                
+            print cloud_opts['sort_order']
         cloud = tag_cloud(freq, **cloud_opts)
 	return cloud # json.dumps(cloud)
 
