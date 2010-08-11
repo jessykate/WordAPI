@@ -101,7 +101,6 @@ INSTALLED_APPS = (
     'django.contrib.sites',
     'django.contrib.messages',    
     'wordapi.api',
-    'wordapi.frontend',
     # Uncomment the next line to enable the admin:
     # 'django.contrib.admin',
 )
