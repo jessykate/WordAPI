@@ -24,7 +24,7 @@ class TagCloudForm(forms.Form):
     normalize = forms.BooleanField(initial=True, help_text = help_text['normalize'], required=False)
     remove_stopwords = forms.BooleanField(initial=True, help_text = help_text['stopwords'], 
                         required=False)
-    sort_order = forms.ChoiceField(required=False, choices = allowed_sort_orders) 
+    sort_order = forms.ChoiceField(help_text= help_text['sort_order'], required=False, choices = allowed_sort_orders) 
     max_words =  forms.IntegerField(help_text = help_text['max_words'], required=False)
     max_size = forms.IntegerField(help_text = help_text['max_size'], required=False)
     min_size = forms.IntegerField(help_text = help_text['min_size'], required=False)

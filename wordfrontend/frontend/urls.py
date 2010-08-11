@@ -1,6 +1,6 @@
 from django.conf.urls.defaults import patterns, url
 from piston.resource import Resource
-from wordapi.frontend.views import *
+from wordfrontend.frontend.views import *
 
 urlpatterns = patterns('',
   url(r'^tagcloud$', tagcloud),

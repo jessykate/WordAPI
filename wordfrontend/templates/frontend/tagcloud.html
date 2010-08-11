@@ -16,6 +16,7 @@ Sizes are extrapolated linearly between the bounding values of min and max size<
 </div>
 
 <form action="" method="post">
+{% csrf_token %}
 {{ tagcloud_form.as_p }}
 <input type="submit" value="Create Tag Cloud">
 </form>
