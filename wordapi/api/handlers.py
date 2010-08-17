@@ -304,11 +304,11 @@ class RequestFrequencyHandler(GeneralHandler):
         tokens =  tokenize(self.fargs[0], **self.kwargs )
         return nltk.FreqDist(tokens)
 
-class TagCloudHandler(GeneralHandler):
+class TagCloudBaseHandler(GeneralHandler):
     ''' assumes body will be a blob of text, not a url. still has option to
 	strip existing html. ''' 
     allowed_methods = ('GET', 'POST')
-    args_required = ['body']
+    #args_required = ['body']
     args_optional = ['tokenizer', 'strip', 'max_words', 'normalize', 
                       'remove_stopwords', 'sort_order',
                      # width and height of the div returned
@@ -316,8 +316,13 @@ class TagCloudHandler(GeneralHandler):
                      # scaling factors for largest and smallest words
                      'max_size', 'min_size']
 
+    def get_text(self):
+        # return the actual contents to be used in the tag cloud. implemented
+        # by child class, depending on the call type-- eg. in-line or url
+        # reference. 
+        pass
+
     def execute(self):
-        #print self.kwargs
         tokenizer_opts = {}
         if 'tokenizer' in self.kwargs.keys():
             tokenizer_opts['tokenizer'] = self.kwargs['tokenizer']
@@ -327,7 +332,7 @@ class TagCloudHandler(GeneralHandler):
             tokenizer_opts['remove_stopwords'] = self.kwargs['remove_stopwords']        
         if 'normalize' in self.kwargs.keys():
             tokenizer_opts['normalize'] = self.kwargs['normalize']        
-        tokens =  tokenize(self.fargs[0], **tokenizer_opts )
+        tokens =  tokenize(self.get_text(), **tokenizer_opts )
         freq = nltk.FreqDist(tokens)
 
         cloud_opts = {}
@@ -346,6 +351,24 @@ class TagCloudHandler(GeneralHandler):
             print cloud_opts['sort_order']
         cloud = tag_cloud(freq, **cloud_opts)
 	return cloud # json.dumps(cloud)
+
+class TagCloudBodyHandler(TagCloudBaseHandler):
+    # 'body' becomes fargs[0] in the parent class's execute() method
+    args_required = ['body']
+
+    def get_text(self):
+        return self.fargs[0]
+
+class TagCloudUrlHandler(TagCloudBaseHandler):
+    # 'url' becomes fargs[0] in the parent class's execute() method
+    args_required = ['url']
+
+    def get_text(self):
+        # the text to be analyzed is passed in via a url, so we need to retrieve it
+        fp = urllib.urlopen(self.fargs[0])
+        print 'retrieving text from %s' % self.fargs[0]
+        text = fp.read()
+        return text
 
 class DiffHandler(GeneralHandler):
 	pass

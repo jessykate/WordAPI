@@ -1,7 +1,7 @@
 from wordapi.api.handlers import (
     UrlTokenHandler, RequestTokenHandler, 
     UrlFrequencyHandler, RequestFrequencyHandler,
-    TagCloudHandler,
+    TagCloudBodyHandler, TagCloudUrlHandler,
     )
 
 from django.conf.urls.defaults import patterns, url
@@ -17,7 +17,9 @@ urlpatterns = patterns('',
   # calculate the token frequency of the contents passed in                       
   url(r'^frequency/request\.(?P<emitter_format>.+)$', Resource(RequestFrequencyHandler)),
   # build a tag cloud from the contents passed in 
-  url(r'^tagcloud\.(?P<emitter_format>.+)$', Resource(TagCloudHandler)),
+  url(r'^tagcloud/body\.(?P<emitter_format>.+)$', Resource(TagCloudBodyHandler)),
+  # build a tag cloud from the url passed in 
+  url(r'^tagcloud/url\.(?P<emitter_format>.+)$', Resource(TagCloudUrlHandler)),
 
 
 )
