@@ -33,7 +33,11 @@ def tagcloud(request):
                 if value:
                     args[field] = value
             
-            url = settings.ROOT_URL + "/api/1.0/tagcloud.json"
+            if 'body' in args:
+                url = settings.ROOT_URL + "/api/1.0/tagcloud/body.json"
+            else: # this is a 'url' call
+                url = settings.ROOT_URL + "/api/1.0/tagcloud/url.json"
+
             headers = {'Content-type': 'application/x-www-form-urlencoded'}
             data = urllib.urlencode(args)
             http = httplib2.Http()

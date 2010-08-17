@@ -3,7 +3,8 @@ from django import forms
 # default is required = True
 class TagCloudForm(forms.Form):
     help_text = {
-        'body' : 'This is the minimum required field.',
+        'body' : 'One of either "url" or "body" fields are the minimum required field. Use the body field if you would like to type or paste your text inline (eg. into this box)',
+        'url' : 'One of either "url" or "body" fields are the minimum required field. Use the url field if you would like text from the specified url to be used for the tag cloud.',
         'strip' : 'Strip any html markup. Default is True.',
         'max_size' : 'Maximum word size in px. Default is 70px.',
         'min_size' : 'Minimum word size in px. Default is 10px.',
@@ -19,7 +20,8 @@ class TagCloudForm(forms.Form):
     allowed_sort_orders = [('random', 'random'), ('frequency', 'frequency'),
                            ('alphabetical', 'alphabetical (not implemented)')]
 
-    body = forms.CharField(widget=forms.Textarea(attrs={'rows':'20', 'cols':60 }), help_text = help_text['body'])
+    body = forms.CharField(widget=forms.Textarea(attrs={'rows':'20', 'cols':60 }), help_text = help_text['body'], required=False)
+    url = forms.CharField(help_text = help_text['url'], required=False)
     strip = forms.BooleanField(initial=True, help_text = help_text['strip'], required=False)
     normalize = forms.BooleanField(initial=True, help_text = help_text['normalize'], required=False)
     remove_stopwords = forms.BooleanField(initial=True, help_text = help_text['stopwords'], 
@@ -32,3 +34,12 @@ class TagCloudForm(forms.Form):
     height = forms.IntegerField(help_text = help_text['height'], required=False)
     tokenizer = forms.CharField(help_text = help_text['tokenizer'], required=False)
 
+    def clean(self):
+        cleaned_data = self.cleaned_data
+        url = cleaned_data.get('url')
+        body = cleaned_data.get('body')
+        if not url and not body:
+            raise forms.ValidationError('You must specify one of either "url" or "body" fields')
+        if url and body:
+            raise forms.ValidationError('Specify only one of either "url" or "body" fields')
+        return cleaned_data
