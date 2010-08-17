@@ -43,7 +43,7 @@ class GeneralHandler(BaseHandler):
         self.kwargs = {}
         for arg in self.args_optional:
             if request.GET.get(arg, None):
-		thisarg = urllib.unquote_plus(request.GET.get(arg))
+		thisarg = urllib.unquote(request.GET.get(arg))
                 self.kwargs[arg] = thisarg
 
         #print 'kwargs:'
@@ -76,7 +76,7 @@ class GeneralHandler(BaseHandler):
         self.kwargs = {}
         for arg in self.args_optional:
             if request.POST.get(arg, None):
-                thisarg = urllib.unquote_plus(request.POST.get(arg))
+                thisarg = urllib.unquote(request.POST.get(arg))
                 self.kwargs[arg] = thisarg
 
         #print 'kwargs'
@@ -107,10 +107,10 @@ def tokenize(body, tokenizer=None, strip='true', normalize=True, remove_stopword
     if not tokenizer:
         tokenizer = r'[\w\-]+'
     else:
-        # XXX TODO why is this not getting converted to a raw string?
-        # convert custom tokenizer to raw string
-        tokenizer = r'%s' % str(tokenizer)
-    print type(tokenizer)
+        print 'using custom tokenizer'
+        print 'tokenizer: %s' % tokenizer
+        tokenizer = urllib.unquote(tokenizer)
+    print tokenizer
     try:
         tknizr = nltk.tokenize.RegexpTokenizer(tokenizer)
     except:
