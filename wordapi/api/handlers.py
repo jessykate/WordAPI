@@ -207,9 +207,15 @@ def tag_cloud(dist, id_ = "", class_ = "", width="400", height=None,
     min_freq = float(dist[MIN][1])
     max_size = float(max_size)
     min_size = float(min_size)
-    m = (max_size - min_size)/(max_freq - min_freq)
-    b = max_size - m*max_freq
-    font_size = lambda freq: m*freq+b
+    # if they're all the same frequency, everything is the same size. use the
+    # mid-point between max_size and min_size (it's left as a function so we
+    # can use it easily in place of a dynamic value below). 
+    if max_freq == min_freq:
+        font_size = lambda freq: (max_size + min_size)/2
+    else:
+        m = (max_size - min_size)/(max_freq - min_freq)
+        b = max_size - m*max_freq
+        font_size = lambda freq: m*freq+b
 
     # determine the sort order. if the sort order is frequency, there's nothing
     # to do since the distribution object is already sorted by frequency. 
@@ -253,7 +259,7 @@ def tag_cloud(dist, id_ = "", class_ = "", width="400", height=None,
     freqs = []
     for f in [x[1] for x in dist]: 
         if f not in freqs: freqs.append(f)
-    style = '''<style>
+    style = '''<style type="text/css">
 .tagcloud {width: %s; height: %s; text-align: center; }
 .word { text-align: center; vertical-align: middle; } ''' % (width, height)
     for f in freqs:
