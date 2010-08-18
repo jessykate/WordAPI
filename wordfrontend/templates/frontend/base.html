@@ -1,15 +1,30 @@
 <html>
 <head>
-<title>WordAPI</title>
+{% block custom_style %}
+{% endblock %}
+
+<link rel="stylesheet" type="text/css" href="/media/style.css">
+<title>WordAPI{% block page_title %}{% endblock %}</title>
+
 </head>
 
 <body>
+<div id="body">
 
+<div id="siteheader">     
+<h1> Word | API</h1>
+</div>
+
+<div id="pageheader">
 {% block header %}
 {% endblock %}
+</div>
 
+<div id="main_content">
 {% block content %}
 {% endblock %}
+</div>
 
+</div>
 </body>
 </html>

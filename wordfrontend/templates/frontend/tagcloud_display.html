@@ -1,9 +1,30 @@
+{% extends "frontend/base.html" %}
+
+{% block custom_style %}
 {{ style|safe }}
-<html>
-<head>
-<title>TagCloud Demo</title>
-</head>
-<body>
+{% endblock %}
+
+{% block page_title %} - TagCloud{% endblock %}
+
+{% block content %}
+
+<div id="tagcloud_wrapper">
 {{ body|safe }}
-</body>
-</html>
+</div>
+
+<div id="infobox">
+<div class=info" id="tagurl">
+This tag cloud was generated with the following (encoded) url:<br/>
+<a href="{{ generator_url }}">{{ generator_url }}</a></p>
+</div>
+<div class="info">
+Export this tagcloud to a png
+</div>
+<div class="info">
+Create a tiny url for this cloud and share! 
+<a href="">Static</a> | <a href="">Dynamic</a> (for url-based clouds only)
+</div>
+</div>
+</div>
+
+{% endblock %}

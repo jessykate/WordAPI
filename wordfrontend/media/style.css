@@ -1,0 +1,68 @@
+body {
+    font-family: arial, verdana;
+    width: 100%;
+    margin: auto;
+    color: #333333;
+    background: -webkit-gradient(
+    linear,
+        left bottom,
+        left top,
+        color-stop(1, rgb(189,187,189)),
+        color-stop(0.6, rgb(255,255,255))
+    );
+    background: -moz-linear-gradient(
+        center bottom,
+        rgb(189,187,189) 100%,
+        rgb(255,255,255) 60%
+    );
+}
+
+#siteheader {
+    height: 100px;
+    padding: 10px;
+    background: -webkit-gradient(
+    linear,
+        left bottom,
+        left top,
+        color-stop(0, rgb(235,235,235)),
+        color-stop(1, rgb(222,200,57))
+    );
+    background: -moz-linear-gradient(
+        center bottom,
+        rgb(235,235,235) 0%,
+        rgb(222,200,57) 100%
+    );
+
+} 
+
+#main_content {
+    padding: 10px;
+}
+
+#tagcloud_wrapper {
+    background: #ffffff;
+    padding-top:30px;
+    padding-bottom: 30px;
+    padding-left: 20px;
+    padding-right: 20px;
+    width: 90%;
+    margin:auto;
+}
+
+#infobox {
+    margin-top: 20px;
+    padding-top: 20px;
+    background: #666666;
+}
+
+#tagurl {
+        text-align: center;
+}
+
+#tagurl a {
+    font-size: 90%;
+    font-variant:small-caps;
+    color: #ffffff;
+    text-decoration: none;
+}
+

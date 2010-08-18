@@ -46,11 +46,20 @@ def tagcloud(request):
             js = json.loads(content)
             body = js['body']
             style = js['style']
+
+            # replace the full body text with placeholder text, and then pass
+            # the API call url to the template so the user can see what was
+            # done. 
+            control_params = args
+            if 'body' in args:
+                control_params['body'] = "your text here"
+            generator_url = url + '?' + urllib.urlencode(control_params)
+
             # note that in the template, body and style need to be given the 'safe'
             # filter so that the markup will be interpreted. otherwise it will be
             # escaped and displayed as strings.
             return render_to_template(request, 'frontend/tagcloud_display.html', {'body' : body,
-                                        'style' : style})
+                                        'style' : style, 'generator_url' : generator_url})
 
 
         else:
