@@ -346,13 +346,16 @@ class TagCloudBaseHandler(GeneralHandler):
                      # scaling factors for largest and smallest words
                      'max_size', 'min_size']
 
+    def execute(self):
+        pass
+
     def get_text(self):
         # return the actual contents to be used in the tag cloud. implemented
         # by child class, depending on the call type-- eg. in-line or url
         # reference. 
         pass
 
-    def execute(self):
+    def get_tokens(self):
         tokenizer_opts = {}
         if 'tokenizer' in self.kwargs.keys():
             tokenizer_opts['tokenizer'] = self.kwargs['tokenizer']
@@ -363,8 +366,13 @@ class TagCloudBaseHandler(GeneralHandler):
         if 'normalize' in self.kwargs.keys():
             tokenizer_opts['normalize'] = self.kwargs['normalize']        
         tokens =  tokenize(self.get_text(), **tokenizer_opts )
-        freq = nltk.FreqDist(tokens)
+        return tokens
 
+    def get_freqdist(self, tokens):
+        freq = nltk.FreqDist(tokens)
+        return freq
+
+    def get_cloud(self, freq)
         cloud_opts = {}
         if 'width' in self.kwargs.keys():
             cloud_opts['width'] = self.kwargs['width']                
@@ -380,7 +388,7 @@ class TagCloudBaseHandler(GeneralHandler):
             cloud_opts['sort_order'] = self.kwargs['sort_order']                
             print cloud_opts['sort_order']
         cloud = tag_cloud(freq, **cloud_opts)
-	return cloud # json.dumps(cloud)
+	    return cloud
 
 class TagCloudBodyHandler(TagCloudBaseHandler):
     # 'body' becomes fargs[0] in the parent class's execute() method
@@ -388,6 +396,12 @@ class TagCloudBodyHandler(TagCloudBaseHandler):
 
     def get_text(self):
         return self.fargs[0]
+
+    def execute(self):
+        tokens = self.get_tokens()
+        freq = self.get_freqdist()
+        return self.get_cloud(freq)
+
 
 class TagCloudUrlHandler(TagCloudBaseHandler):
     # 'url' becomes fargs[0] in the parent class's execute() method
@@ -399,6 +413,20 @@ class TagCloudUrlHandler(TagCloudBaseHandler):
         print 'retrieving text from %s' % self.fargs[0]
         text = fp.read()
         return text
+
+    def execute(self):
+        tokens = self.get_tokens()
+        freq = self.get_freqdist()
+        return self.get_cloud(freq)
+
+class TagCloudFreqHandler(TagCloudBaseHandler):
+    # builds the tag cloud from an already computed frequency distribution
+    args_required = ['freqs']
+    
+    def execute(self):
+        return self.get_cloud(freqs)
+
+
 
 class DiffHandler(GeneralHandler):
 	pass
