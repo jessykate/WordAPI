@@ -165,21 +165,45 @@ def num_to_word(freq):
     return wordstring
 
 
-def color_scheme(color_a=None, color_b=None, num_colors=5):
-    ''' This function is just a stub for now, but it should have a series of
-    colour schemes to select randomly from, or be able to extrapolate between
-    two values to return a custom colour scheme. ''' 
+def color_scheme(color_a=None, color_b=None, total_steps=5):
+    '''Has a series of colour schemes to select randomly from, or
+        extrapolates between two values to return a custom colour scheme. ''' 
     
     default_palette = ["#FF6600", "#CC6626", "#99664D", "#666673", "#336699"]
 
     # if no colours are specified, return a random colour scheme. 
     if not color_a or not color_b:
-        return default_palette
+        palette = default_palette
     else:
-        return default_palette
+
+        # the start and end colours are also steps, so subtract 2 from the steps
+        # we have to calculate. 
+        steps = total_steps - 2
+
+        ra = color_a[0:2]
+        ga = color_a[2:4]
+        ba = color_a[4:6]
+        rb = color_b[0:2]
+        gb = color_b[2:4]
+        bb = color_b[4:6]
+
+        delta_r = ra - rb
+        delta_g = ga - gb
+        delta_b = ba - bb
+
+        palette = [color_a,]
+        for step in xrange(steps):
+            step += 1
+            r = ra + step*(delta_r/steps)
+            g = ga + step*(delta_g/steps)
+            b = ba + step*(delta_b/steps)
+            palette.append('#%x%x%x' % (r,g,b))
+        palette.append(color_b)
+
+    return palette
          
 
-def tag_cloud(dist, id_ = "", class_ = "", width="400", height=None, 
+def tag_cloud(dist, id_ = "", class_ = "", width=None, height=None, 
               max_size=70, min_size=10, max_words = None, sort_order="random"):
     ''' returns a dict with style and body elements. style contains
     defalt styling for the tag cloud, while body contains the html
