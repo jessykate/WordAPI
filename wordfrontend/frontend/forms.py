@@ -24,17 +24,20 @@ class TagCloudForm(forms.Form):
     body = forms.CharField(widget=forms.Textarea(attrs={'rows':'20', 'cols':60 }), help_text = help_text['body'], required=False)
     url = forms.CharField(help_text = help_text['url'], required=False)
     freqs = forms.CharField(help_text = help_text['freqs'], required=False)
+    max_words =  forms.IntegerField(help_text = help_text['max_words'], required=False)
+    start_color = forms.CharField(required=False)
+    end_color = forms.CharField(required=False)
+    color_steps = forms.IntegerField(required=False)
     strip = forms.BooleanField(initial=True, help_text = help_text['strip'], required=False)
     normalize = forms.BooleanField(initial=True, help_text = help_text['normalize'], required=False)
     remove_stopwords = forms.BooleanField(initial=True, help_text = help_text['stopwords'], 
                         required=False)
-    sort_order = forms.ChoiceField(help_text= help_text['sort_order'], required=False, choices = allowed_sort_orders) 
-    max_words =  forms.IntegerField(help_text = help_text['max_words'], required=False)
     max_size = forms.IntegerField(help_text = help_text['max_size'], required=False)
     min_size = forms.IntegerField(help_text = help_text['min_size'], required=False)
+    tokenizer = forms.CharField(help_text = help_text['tokenizer'], required=False)
     width = forms.IntegerField(help_text = help_text['width'], required=False)
     height = forms.IntegerField(help_text = help_text['height'], required=False)
-    tokenizer = forms.CharField(help_text = help_text['tokenizer'], required=False)
+    sort_order = forms.ChoiceField(help_text= help_text['sort_order'], required=False, choices = allowed_sort_orders) 
 
     def clean(self):
         cleaned_data = self.cleaned_data
@@ -45,4 +48,12 @@ class TagCloudForm(forms.Form):
             raise forms.ValidationError('You must specify one of "url", "body" or "freqs" fields')
         if (url and body) or (url and freqs) or (body and freqs):
             raise forms.ValidationError('Specify only one of "url" or "body" or "freqs" fields')
+
+        start_color = cleaned_data.get('start_color')
+        end_color = cleaned_data.get('end_color')
+        color_steps = cleaned_data.get('color_steps')
+        if start_color or end_color or color_steps:
+            if not (start_color and end_color and color_steps):
+                raise forms.ValidationError('To customize the color scheme, please enter all color scheme information: start color, end color, and number of steps to extrapolate in between.')
+
         return cleaned_data

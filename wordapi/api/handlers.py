@@ -169,44 +169,49 @@ def num_to_word(freq):
 
 def color_scheme(color_a=None, color_b=None, total_steps=5):
     '''Has a series of colour schemes to select randomly from, or
-        extrapolates between two values to return a custom colour scheme. ''' 
+       extrapolates between two values to return a custom colour scheme. ''' 
     
     default_palette = ["#FF6600", "#CC6626", "#99664D", "#666673", "#336699"]
 
     # if no colours are specified, return a random colour scheme. 
     if not color_a or not color_b:
         palette = default_palette
+
     else:
+        steps = int(total_steps)-1
 
-        # the start and end colours are also steps, so subtract 2 from the steps
-        # we have to calculate. 
-        steps = total_steps - 2
+        color_a = color_a.strip('#')
+        color_b = color_b.strip('#')
 
-        ra = color_a[0:2]
-        ga = color_a[2:4]
-        ba = color_a[4:6]
-        rb = color_b[0:2]
-        gb = color_b[2:4]
-        bb = color_b[4:6]
+        ra = int(color_a[0:2], 16)
+        ga = int(color_a[2:4], 16)
+        ba = int(color_a[4:6], 16)
+        rb = int(color_b[0:2], 16)
+        gb = int(color_b[2:4], 16)
+        bb = int(color_b[4:6], 16)
 
         delta_r = ra - rb
         delta_g = ga - gb
         delta_b = ba - bb
 
-        palette = [color_a,]
+        # note the color_a gets covered by the '0' step. 
+        palette = []
         for step in xrange(steps):
-            step += 1
-            r = ra + step*(delta_r/steps)
-            g = ga + step*(delta_g/steps)
-            b = ba + step*(delta_b/steps)
-            palette.append('#%x%x%x' % (r,g,b))
-        palette.append(color_b)
+            r = ra - step*(delta_r/steps)
+            g = ga - step*(delta_g/steps)
+            b = ba - step*(delta_b/steps)
+            print r,g,b
+            rgb = '#'+''.join((hex(r)+hex(g)+hex(b)).split('0x'))
+            palette.append(rgb)
+        palette.append('#'+color_b)
 
     return palette
-         
+
 
 def tag_cloud(dist, id_ = "", class_ = "", width=None, height=None, 
-              max_size=70, min_size=10, max_words = None, sort_order="random"):
+              max_size=70, min_size=10, max_words = None, 
+              start_color=None, end_color=None, color_steps=None, 
+              sort_order="random"):
     ''' returns a dict with style and body elements. style contains
     defalt styling for the tag cloud, while body contains the html
     markup. '''
@@ -277,8 +282,12 @@ def tag_cloud(dist, id_ = "", class_ = "", width=None, height=None,
     body += '''</div>'''
     #print body
 
-    num_colors = 5
-    colors = color_scheme()
+    if start_color and end_color and color_steps:
+        num_colors = int(color_steps)
+        colors = color_scheme(start_color, end_color, color_steps)
+    else:
+        num_colors = 5
+        colors = color_scheme()
 
     # get the distinct frequencies and specify a font-size and color for each,
     # that corresponds to its size 
@@ -343,6 +352,8 @@ class TagCloudBaseHandler(GeneralHandler):
     #args_required = ['body']
     args_optional = ['tokenizer', 'strip', 'max_words', 'normalize', 
                       'remove_stopwords', 'sort_order',
+                     # custom color scheme options
+                      'start_color', 'end_color', 'color_steps',
                      # width and height of the div returned
                      'width', 'height', 
                      # scaling factors for largest and smallest words
@@ -389,6 +400,12 @@ class TagCloudBaseHandler(GeneralHandler):
         if 'sort_order' in self.kwargs.keys():
             cloud_opts['sort_order'] = self.kwargs['sort_order']                
             print cloud_opts['sort_order']
+        if 'start_color' in self.kwargs.keys():
+            cloud_opts['start_color'] = self.kwargs['start_color']                
+        if 'end_color' in self.kwargs.keys():
+            cloud_opts['end_color'] = self.kwargs['end_color']                
+        if 'color_steps' in self.kwargs.keys():
+            cloud_opts['color_steps'] = self.kwargs['color_steps']                
         cloud = tag_cloud(freq, **cloud_opts)
         return cloud
 
