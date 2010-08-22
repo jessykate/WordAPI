@@ -2,6 +2,7 @@ from piston.handler import BaseHandler
 from piston.utils import rc
 import nltk, urllib, urllib2
 import urllib, random
+from lib import html_unescape
 try:
     import json
 except:
@@ -117,6 +118,7 @@ def tokenize(body, tokenizer=None, strip='true', normalize=True, remove_stopword
         resp = rc.BAD_REQUEST
         resp.write(": Tokenizer parameter must be a valid regular expression.")
         return resp
+    #body = body.encode('utf-8')
     tokens = tknizr.tokenize(body)
     if normalize:
         tokens = [token.lower() for token in tokens] 
@@ -276,7 +278,7 @@ def tag_cloud(dist, id_ = "", class_ = "", width=None, height=None,
     #print body
 
     num_colors = 5
-    colors = color_scheme(num_colors=num_colors)
+    colors = color_scheme()
 
     # get the distinct frequencies and specify a font-size and color for each,
     # that corresponds to its size 
@@ -297,8 +299,9 @@ def tag_cloud(dist, id_ = "", class_ = "", width=None, height=None,
 </style>'''
     #print 'style portion'
     #print style
-  
-    return {'body': body, 'style': style}
+    resp =  {'body': body, 'style': style}
+    #open('/tmp/tagdata', 'w').write(json.dumps(resp)).close()
+    return resp
 
 class UrlTokenHandler(GeneralHandler):
     allowed_methods = ('GET',)
@@ -372,7 +375,7 @@ class TagCloudBaseHandler(GeneralHandler):
         freq = nltk.FreqDist(tokens)
         return freq
 
-    def get_cloud(self, freq)
+    def get_cloud(self, freq):
         cloud_opts = {}
         if 'width' in self.kwargs.keys():
             cloud_opts['width'] = self.kwargs['width']                
@@ -388,7 +391,7 @@ class TagCloudBaseHandler(GeneralHandler):
             cloud_opts['sort_order'] = self.kwargs['sort_order']                
             print cloud_opts['sort_order']
         cloud = tag_cloud(freq, **cloud_opts)
-	    return cloud
+        return cloud
 
 class TagCloudBodyHandler(TagCloudBaseHandler):
     # 'body' becomes fargs[0] in the parent class's execute() method
@@ -399,7 +402,7 @@ class TagCloudBodyHandler(TagCloudBaseHandler):
 
     def execute(self):
         tokens = self.get_tokens()
-        freq = self.get_freqdist()
+        freq = self.get_freqdist(tokens)
         return self.get_cloud(freq)
 
 
@@ -411,12 +414,19 @@ class TagCloudUrlHandler(TagCloudBaseHandler):
         # the text to be analyzed is passed in via a url, so we need to retrieve it
         fp = urllib.urlopen(self.fargs[0])
         print 'retrieving text from %s' % self.fargs[0]
-        text = fp.read()
-        return text
+        raw = fp.read()
+        encoding = fp.headers['content-type'].split('charset=')[-1]
+        if encoding == 'text/plain':
+            encoding = 'ascii'
+        elif encoding == 'text/html':
+            encoding = 'utf-8'
+        ustring = unicode(raw, encoding)
+        ustring_escaped = html_unescape(ustring)
+        return ustring_escaped
 
     def execute(self):
         tokens = self.get_tokens()
-        freq = self.get_freqdist()
+        freq = self.get_freqdist(tokens)
         return self.get_cloud(freq)
 
 class TagCloudFreqHandler(TagCloudBaseHandler):
