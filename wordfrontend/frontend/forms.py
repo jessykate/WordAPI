@@ -3,18 +3,19 @@ from django import forms
 # default is required = True
 class TagCloudForm(forms.Form):
     help_text = {
-        'body' : 'One of either "url" or "body" fields are the minimum required field. Use the body field if you would like to type or paste your text inline (eg. into this box)',
-        'url' : 'One of either "url" or "body" fields are the minimum required field. Use the url field if you would like text from the specified url to be used for the tag cloud.',
+        'body' : 'One of either "url", "body" or "freqs" fields are the minimum required field. Use the body field if you would like to type or paste your text inline (eg. into this box)',
+        'url' : 'One of either "url" or "body" or "freqs" fields are the minimum required field. Use the url field if you would like text from the specified url to be used for the tag cloud.',
         'strip' : 'Strip any html markup. Default is True.',
         'max_size' : 'Maximum word size in px. Default is 70px.',
         'min_size' : 'Minimum word size in px. Default is 10px.',
-        'width' : 'Width of the div containing the tag cloud in px. Default is 400px',
+        'width' : 'Width of the div containing the tag cloud in px. Default is none-- eg. the div will be as wide as the div it is contained by.%',
         'height' : 'Height of the div containing the tag cloud in px. Default is None, to allow the height to accomodate as many words as needed.',
         'tokenizer' : 'You may specify a custom tokenizer if you like, by passing in a <a href="http://docs.python.org/library/re.html">python regular expression</a>',
         'max_words' : 'Maximum number of words to be included in the tag cloud (will always truncate least frequent words)',
         'normalize' : "this option will normalize the case of all words, making 'Hello' and 'hello' equivalent",
         'stopwords' : "Whether or not to remove (exclude) common english words (so-called 'stop words' from the tag cloud, such as 'the' and 'it'. Default is True.",
-        'sort_order' : 'What order should the words be sorted in? Options are frequency, random, or alphabetical. In practice random seems to look best most of the time, but try different ones and see what you like.'
+        'sort_order' : 'What order should the words be sorted in? Options are frequency, random, or alphabetical. In practice random seems to look best most of the time, but try different ones and see what you like.',
+        'freqs' : "Enter in a dictionary of word:frequency counts",
     }
 
     allowed_sort_orders = [('random', 'random'), ('frequency', 'frequency'),
@@ -22,6 +23,7 @@ class TagCloudForm(forms.Form):
 
     body = forms.CharField(widget=forms.Textarea(attrs={'rows':'20', 'cols':60 }), help_text = help_text['body'], required=False)
     url = forms.CharField(help_text = help_text['url'], required=False)
+    freqs = forms.CharField(help_text = help_text['freqs'], required=False)
     strip = forms.BooleanField(initial=True, help_text = help_text['strip'], required=False)
     normalize = forms.BooleanField(initial=True, help_text = help_text['normalize'], required=False)
     remove_stopwords = forms.BooleanField(initial=True, help_text = help_text['stopwords'], 
@@ -38,8 +40,9 @@ class TagCloudForm(forms.Form):
         cleaned_data = self.cleaned_data
         url = cleaned_data.get('url')
         body = cleaned_data.get('body')
-        if not url and not body:
-            raise forms.ValidationError('You must specify one of either "url" or "body" fields')
-        if url and body:
-            raise forms.ValidationError('Specify only one of either "url" or "body" fields')
+        freqs = cleaned_data.get('freqs')
+        if not url and not body and not freqs:
+            raise forms.ValidationError('You must specify one of "url", "body" or "freqs" fields')
+        if (url and body) or (url and freqs) or (body and freqs):
+            raise forms.ValidationError('Specify only one of "url" or "body" or "freqs" fields')
         return cleaned_data

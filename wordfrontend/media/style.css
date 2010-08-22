@@ -1,5 +1,6 @@
 body {
     font-family: arial, verdana;
+    font-size: 120%;
     width: 100%;
     margin: auto;
     color: #333333;
@@ -20,6 +21,7 @@ body {
 #siteheader {
     height: 100px;
     padding: 10px;
+    color: #000066;
     background: -webkit-gradient(
     linear,
         left bottom,
@@ -36,7 +38,7 @@ body {
 } 
 
 #main_content {
-    padding: 10px;
+    padding: 15px;
 }
 
 #tagcloud_wrapper {
@@ -45,14 +47,13 @@ body {
     padding-bottom: 30px;
     padding-left: 20px;
     padding-right: 20px;
-    width: 90%;
-    margin:auto;
 }
 
 #infobox {
     margin-top: 20px;
     padding-top: 20px;
-    background: #666666;
+    color: #999999;
+    background: #000066;
 }
 
 #tagurl {
@@ -62,7 +63,20 @@ body {
 #tagurl a {
     font-size: 90%;
     font-variant:small-caps;
-    color: #ffffff;
+    color: #bbbbbb;
     text-decoration: none;
 }
 
+#frontpage_overview {
+    float: left;
+    width: 70%;
+}
+
+#sidebar {
+    float:right;
+    width: 25%;
+}
+
+.clear {
+    clear: both; 
+}

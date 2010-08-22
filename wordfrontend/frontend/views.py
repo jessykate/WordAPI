@@ -2,6 +2,7 @@
 from django.conf import settings
 from django.shortcuts import render_to_response
 from django.template import RequestContext
+from django.http import HttpResponseRedirect
 from django.core.context_processors import csrf
 from frontend.forms import TagCloudForm
 import urllib, httplib2
@@ -35,6 +36,8 @@ def tagcloud(request):
             
             if 'body' in args:
                 url = settings.ROOT_URL + "/api/1.0/tagcloud/body.json"
+            elif 'freqs' in args:
+                url = settings.ROOT_URL + "/api/1.0/tagcloud/freq.json"
             else: # this is a 'url' call
                 url = settings.ROOT_URL + "/api/1.0/tagcloud/url.json"
 
