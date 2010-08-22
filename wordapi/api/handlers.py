@@ -300,7 +300,6 @@ def tag_cloud(dist, id_ = "", class_ = "", width=None, height=None,
     #print 'style portion'
     #print style
     resp =  {'body': body, 'style': style}
-    #open('/tmp/tagdata', 'w').write(json.dumps(resp)).close()
     return resp
 
 class UrlTokenHandler(GeneralHandler):
@@ -434,23 +433,8 @@ class TagCloudFreqHandler(TagCloudBaseHandler):
     args_required = ['freqs']
     
     def execute(self):
+        freqs = json.loads(self.fargs[0])
         return self.get_cloud(freqs)
-
-
-
-class DiffHandler(GeneralHandler):
-	pass
-
-
-class TopWordComparisonHandler(GeneralHandler):
-    ''' takes the top N most frequent words in two documents and says which
-    ones are shared between the two.''' 
-    pass
-
-class FeedPhraseDetectionHandler(GeneralHandler):
-    ''' Lets the user register a url or feed to be checked regularly for a
-    specified phrase.''' 
-    pass
 
 # let the user register a call back when something is triggered. 
 
