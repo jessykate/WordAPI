@@ -124,6 +124,7 @@ def tokenize(body, tokenizer=None, strip='true', normalize=True, remove_stopword
         tokens = [token.lower() for token in tokens] 
     if remove_stopwords:
         stopwords = nltk.corpus.stopwords.words('english')
+        stopwords.extend(['1','2','3','4','5','6','7','8','9','0']) 
         # call lower() on each token because we can't be sure the tokens are
         # normalized. 
         tokens = [token for token in tokens if token.lower() not in stopwords]
@@ -278,7 +279,7 @@ def tag_cloud(dist, id_ = "", class_ = "", width=None, height=None,
         # the user may specify additional styling. **note**: make sure the
         # space after the span is maintained; otherwise the spans within the
         # div won't wrap. 
-        body += '''<span class="word %s">%s</span> ''' % (num_to_word(freq), word)
+        body += '''<span title="%d" class="word %s">%s</span> ''' % (freq, num_to_word(freq), word)
     body += '''</div>'''
     #print body
 
