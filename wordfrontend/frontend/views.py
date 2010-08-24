@@ -5,14 +5,15 @@ from django.template import RequestContext
 from django.http import HttpResponseRedirect
 from django.core.context_processors import csrf
 from frontend.forms import TagCloudForm
-import urllib, httplib2
+import urllib, httplib2, datetime
 import pymongo
+from pymongo.objectid import ObjectId
 try:
     import json
 except:
     import simplejson as json
 
-def render_to_template(request, template, kwargs):
+def render_to_formtemplate(request, template, kwargs):
     kwargs.update(csrf(request))
     return render_to_response(template, kwargs)
 
@@ -22,7 +23,7 @@ def Index(request):
 def tagcloud(request):
     if request.method == 'GET':
         form = TagCloudForm()
-        return render_to_template(request, 'frontend/tagcloud.html', {'domain': settings.ROOT_URL,'tagcloud_form' : form })
+        return render_to_formtemplate(request, 'frontend/tagcloud.html', {'domain': settings.ROOT_URL,'tagcloud_form' : form })
 
     else:
         form = TagCloudForm(request.POST)
@@ -59,12 +60,14 @@ def tagcloud(request):
                 control_params['body'] = "your text here"
             generator_url = url + '?' + urllib.urlencode(control_params)
 
+            # tell the browser where it can insert a line break
             generator_url_display = generator_url.replace('&', '<wbr>&')
 
+            print type(content)
             # note that in the template, body and style need to be given the 'safe'
             # filter so that the markup will be interpreted. otherwise it will be
             # escaped and displayed as strings.
-            return render_to_template(request, 'frontend/tagcloud_display.html', {'body' : body,
+            return render_to_formtemplate(request, 'frontend/tagcloud_display.html', {'body' : body,
                                         'style' : style, 'generator_url' : generator_url,
                                         'generator_url_display': generator_url_display, 
                                         'tagcloud_json': content})
@@ -88,6 +91,7 @@ def save(request):
     # get arguments
     data = request.POST.get('data')
     print request.POST
+    print 'data: ', data
     # save data and url to db
     record = json.loads(data)
     record['created'] = datetime.datetime.now()
@@ -105,3 +109,11 @@ def save(request):
     return HttpResponseRedirect("/cloud/%s" % uid)
 
     # a dynamic tagcloud saves the source information and rendering preferences
+
+def cloud(request, cloud_id):
+    print 'cloud id to be looked up: ', cloud_id
+    con = pymongo.Connection()
+    collection = con.wordapi.tagclouds
+    record = collection.find_one({'_id':ObjectId(cloud_id)})
+    return render_to_response('frontend/cloud.html', {'cloud':record})
+
