@@ -17,8 +17,8 @@ $(document).ready(function() {
         buttons : {
             'Create!' : function() { 
                 // check validity of arguments
-                var test=0;
                 // submit the form
+                $('#save-form').submit();
             },
             'Cancel' : function() {
                 $(this).dialog("close");
@@ -37,7 +37,7 @@ $(document).ready(function() {
 
 {% block content %}
 <div id="save-box">
-<form id="save-form">
+<form id="save-form" action="save" method="POST">
 {% csrf_token %}
 <label for="name">Name your cloud (optional)</label>
 <input type="text" name="name"><br>

@@ -93,16 +93,13 @@ def save(request):
     if request.method == 'GET':
         return HttpResponseRedirect("/")
 
-    # a static tagcloud just saves the html as it is
-
-    # get arguments
     data = request.POST.get('data')
-    print request.POST
-    print 'data: ', data
     # save data and url to db
     record = json.loads(data)
     record['created'] = datetime.datetime.now()
-    record['type'] = 'static'
+    record['update_type'] = request.POST.get('update')
+    if request.POST.get('name', None):
+        record['cloud_name'] = request.POST.get('name')
     # record['owner'] = username
     # record['permissions'] = public
     con = pymongo.Connection()
@@ -122,5 +119,6 @@ def cloud(request, cloud_id):
     con = pymongo.Connection()
     collection = con.wordapi.tagclouds
     record = collection.find_one({'_id':ObjectId(cloud_id)})
+    print record['cloud_name']
     return render_to_template(request, 'frontend/cloud.html', {'cloud':record})
 

@@ -7,6 +7,11 @@
 
 <body>
 <div id="cloudwrapper">
+{% if cloud.cloud_name %}
+  <div id="cloudtitle">
+  <h1>{{ cloud.cloud_name }}</h1>
+  </div>
+{% endif %}
 {{ cloud.body|safe }}
 </div>
 <div id="cloudinfo">

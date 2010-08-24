@@ -4,6 +4,11 @@ body {
     margin: auto;
 }
 
+#cloudtitle {
+    text-align: center;
+    font-size: 120%;
+}
+
 #cloudwrapper {
     padding-top: 20px;
     padding-bottom: 20px;
