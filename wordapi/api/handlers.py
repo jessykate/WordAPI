@@ -429,8 +429,11 @@ class TagCloudUrlHandler(TagCloudBaseHandler):
 
     def get_text(self):
         # the text to be analyzed is passed in via a url, so we need to retrieve it
-        fp = urllib.urlopen(self.fargs[0])
-        print 'retrieving text from %s' % self.fargs[0]
+        url = self.fargs[0]
+        if not url.startswith('http://'):
+            url = 'http://'+url
+        fp = urllib.urlopen(url)
+        print 'retrieving text from %s' % url
         raw = fp.read()
         encoding = fp.headers['content-type'].split('charset=')[-1]
         if encoding == 'text/plain':
