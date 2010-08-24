@@ -1,2 +1,2 @@
-#ROOT_URL = "http://wordapi.com"
-ROOT_URL = "http://localhost:8712"
+ROOT_URL = "http://wordapi.com"
+#ROOT_URL = "http://localhost:8712"
