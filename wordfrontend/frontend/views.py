@@ -6,6 +6,7 @@ from django.http import HttpResponseRedirect
 from django.core.context_processors import csrf
 from frontend.forms import TagCloudForm
 import urllib, httplib2
+import pymongo
 try:
     import json
 except:
@@ -58,11 +59,15 @@ def tagcloud(request):
                 control_params['body'] = "your text here"
             generator_url = url + '?' + urllib.urlencode(control_params)
 
+            generator_url_display = generator_url.replace('&', '<wbr>&')
+
             # note that in the template, body and style need to be given the 'safe'
             # filter so that the markup will be interpreted. otherwise it will be
             # escaped and displayed as strings.
             return render_to_template(request, 'frontend/tagcloud_display.html', {'body' : body,
-                                        'style' : style, 'generator_url' : generator_url})
+                                        'style' : style, 'generator_url' : generator_url,
+                                        'generator_url_display': generator_url_display, 
+                                        'tagcloud_json': content})
 
 
         else:
@@ -74,4 +79,29 @@ def tagcloud(request):
                                         'tagcloud_form' : form
                                         })
 
+def save(request):
+    if request.method == 'GET':
+        return HttpResponseRedirect("/")
 
+    # a static tagcloud just saves the html as it is
+
+    # get arguments
+    data = request.POST.get('data')
+    print request.POST
+    # save data and url to db
+    record = json.loads(data)
+    record['created'] = datetime.datetime.now()
+    record['type'] = 'static'
+    # record['owner'] = username
+    # record['permissions'] = public
+    con = pymongo.Connection()
+    collection = con.wordapi.tagclouds
+    oid = collection.insert(record)
+
+    # use uid from db as unique url
+    uid = str(oid)
+    # redirect to unique url
+    print uid
+    return HttpResponseRedirect("/cloud/%s" % uid)
+
+    # a dynamic tagcloud saves the source information and rendering preferences

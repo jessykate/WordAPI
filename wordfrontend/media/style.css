@@ -25,19 +25,19 @@ body {
 
 #siteheader {
     height: 50px;
-    color: #000066;
+    color: ##ffffff;
     width: 100%;
     background: -webkit-gradient(
     linear,
         left bottom,
         left top,
         color-stop(0, rgb(235,235,235)),
-        color-stop(1, rgb(222,200,57))
+        color-stop(1, rgb(0,0,102))
     );
     background: -moz-linear-gradient(
         center bottom,
         rgb(235,235,235) 0%,
-        rgb(222,200,57) 100%
+        rgb(0,0,102) 100%
     );
 
 } 
@@ -58,7 +58,7 @@ body {
     margin-top: 20px;
     padding-top: 20px;
     color: #999999;
-    background: #000066;
+    background: #404040;
 }
 
 #tagurl {

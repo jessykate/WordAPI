@@ -15,14 +15,21 @@
 <div id="infobox">
 <div class=info" id="tagurl">
 This tag cloud was generated with the following (encoded) url:<br/>
-<a href="{{ generator_url }}">{{ generator_url }}</a></p>
+<a href="{{ generator_url }}">{{ generator_url_display|safe }}</a></p>
 </div>
 <div class="info">
 Export this tagcloud to a png
 </div>
 <div class="info">
 Create a tiny url for this cloud and share! 
-<a href="">Static</a> | <a href="">Dynamic</a> (for url-based clouds only)
+<form action="save" method="POST">
+{% csrf_token %}
+<input type="hidden" name="data" value="{{ tagcloud_json_}}">
+<input type="hidden" name="test1" value={{ tagcloud_json_}}>
+<input type="hidden" name="test2" value="wtf?">
+<input type="submit" value="Static">
+</form>
+<a href="save">Static</a> | <a href="">Dynamic</a> (for url-based clouds only)
 </div>
 </div>
 </div>
