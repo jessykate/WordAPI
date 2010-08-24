@@ -24,8 +24,8 @@ Export this tagcloud to a png
 Create a tiny url for this cloud and share! 
 <form action="save" method="POST">
 {% csrf_token %}
-<input type="hidden" name="data" value="{{ tagcloud_json_}}">
-<input type="hidden" name="test1" value={{ tagcloud_json_}}>
+<input type="hidden" name="data" value="{{ tagcloud_json|escape }}">
+<input type="hidden" name="test1" value={{ generator_url }}>
 <input type="hidden" name="test2" value="wtf?">
 <input type="submit" value="Static">
 </form>
