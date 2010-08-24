@@ -18,10 +18,15 @@ body {
     );
 }
 
+.container {
+    margin: 0 auto; 
+    width:1000px;
+}
+
 #siteheader {
-    height: 100px;
-    padding: 10px;
-    color: #ffffff;
+    height: 50px;
+    color: ##ffffff;
+    width: 100%;
     background: -webkit-gradient(
     linear,
         left bottom,
