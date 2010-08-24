@@ -14,8 +14,15 @@ except:
     import simplejson as json
 
 def render_to_formtemplate(request, template, kwargs):
+    ''' Add csrf token, then call the regular render_to_template'''
     kwargs.update(csrf(request))
+    return render_to_template(request, template, kwargs)
+
+def render_to_template(request, template, kwargs):
+    '''Add standard template variables before rendering the template'''
+    kwargs['home_page'] = settings.HOME_PAGE
     return render_to_response(template, kwargs)
+
 
 def Index(request):
     return render_to_response('frontend/index.html')
@@ -115,5 +122,5 @@ def cloud(request, cloud_id):
     con = pymongo.Connection()
     collection = con.wordapi.tagclouds
     record = collection.find_one({'_id':ObjectId(cloud_id)})
-    return render_to_response('frontend/cloud.html', {'cloud':record})
+    return render_to_template(request, 'frontend/cloud.html', {'cloud':record})
 

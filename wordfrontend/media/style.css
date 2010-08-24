@@ -85,3 +85,26 @@ body {
 .clear {
     clear: both; 
 }
+
+#infobox {
+    padding-left: 15px;
+    padding-right: 15px;
+}
+
+#save-box {
+    background: red;
+}
+
+#save-form {
+    padding: 10px;
+    font-size: 70%;
+}
+
+#update-type {
+    margin-top: 10px;
+    border: none;
+}
+
+.ui-dialog {
+    background: #666666;
+}
