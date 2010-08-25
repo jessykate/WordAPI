@@ -1,5 +1,6 @@
 body {
     font-family: arial, verdana;
+    color: #666666;
     width: 80%;
     margin: auto;
 }
@@ -12,6 +13,7 @@ body {
 #cloudwrapper {
     padding-top: 20px;
     padding-bottom: 20px;
+    min-height: 500px;
 }
 
 #cloudinfo {

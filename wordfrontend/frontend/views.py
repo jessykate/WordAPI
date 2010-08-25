@@ -8,6 +8,7 @@ from frontend.forms import TagCloudForm
 import urllib, httplib2, datetime
 import pymongo
 from pymongo.objectid import ObjectId
+from lib import bitly_shorten
 try:
     import json
 except:
@@ -93,8 +94,8 @@ def save(request):
     if request.method == 'GET':
         return HttpResponseRedirect("/")
 
-    data = request.POST.get('data')
     # save data and url to db
+    data = request.POST.get('data')
     record = json.loads(data)
     record['created'] = datetime.datetime.now()
     record['update_type'] = request.POST.get('update')
@@ -102,14 +103,21 @@ def save(request):
         record['cloud_name'] = request.POST.get('name')
     # record['owner'] = username
     # record['permissions'] = public
+    
+    # create the unique id for this record
+    oid = ObjectId()
+    uid = str(oid)
+    record['_id'] = oid
+    # create short link
+    long_url = settings.HOME_PAGE + '/cloud/' + uid
+    short_url = bitly_shorten(long_url)
+    print short_url
+    record['short_url'] = short_url
     con = pymongo.Connection()
     collection = con.wordapi.tagclouds
-    oid = collection.insert(record)
+    collection.insert(record)
 
-    # use uid from db as unique url
-    uid = str(oid)
-    # redirect to unique url
-    print uid
+    # redirect to the cloud's page
     return HttpResponseRedirect("/cloud/%s" % uid)
 
     # a dynamic tagcloud saves the source information and rendering preferences
@@ -119,6 +127,5 @@ def cloud(request, cloud_id):
     con = pymongo.Connection()
     collection = con.wordapi.tagclouds
     record = collection.find_one({'_id':ObjectId(cloud_id)})
-    print record['cloud_name']
     return render_to_template(request, 'frontend/cloud.html', {'cloud':record})
 
