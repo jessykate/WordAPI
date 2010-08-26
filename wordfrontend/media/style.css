@@ -149,6 +149,11 @@ body {
     width: 25%;
 }
 
+#content {
+    float: left;
+    width: 70%;
+}
+
 .clear {
     clear: both; 
 }
