@@ -17,7 +17,14 @@ except:
 def render_to_formtemplate(request, template, kwargs={}):
     ''' Add csrf token, then call the regular render_to_template'''
     kwargs.update(csrf(request))
-    return render_to_response(template, kwargs)
+    return render_to_template(request, template, kwargs)
+
+def render_to_template(request, template, kwargs={}):
+    # calls the RequestContext which populates with default template variables
+    return render_to_response(template, kwargs, 
+                context_instance=RequestContext(request))
+
+
 
 def tagcloud(request):
     if request.method == 'GET':
@@ -76,7 +83,7 @@ def tagcloud(request):
             print request.POST
             print 'Form did not validate'
             form = TagCloudForm(request.POST)
-            return render_to_response('frontend/tagcloud.html', 
+            return render_to_formtemplate(request, 'frontend/tagcloud.html', 
                                         {'domain': settings.ROOT_URL,
                                         'tagcloud_form' : form
                                         })
@@ -117,5 +124,5 @@ def cloud(request, cloud_id):
     con = pymongo.Connection()
     collection = con.wordapi.tagclouds
     record = collection.find_one({'_id':ObjectId(cloud_id)})
-    return render_to_response('frontend/cloud.html', {'cloud':record})
+    return render_to_template(request, 'frontend/cloud.html', {'cloud':record})
 
