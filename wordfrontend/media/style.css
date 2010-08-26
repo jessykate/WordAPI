@@ -4,24 +4,19 @@ body {
     width: 100%;
     margin: auto;
     color: #333333;
-    background: -webkit-gradient(
-    linear,
-        left bottom,
-        left top,
-        color-stop(1, #65a9d7),
-        color-stop(0.7, rgb(255,255,255))
-    );
-    background: -moz-linear-gradient(
-        center bottom,
-        rgb(189,187,189) 100%,
-        #65a9d7 70%
-    );
 }
 
 .container {
     margin: 0px auto; 
     width:1000px;
 }
+
+.main_container {
+    margin: 0px auto; 
+    width:1000px;
+    background: #ffffff;
+}
+
 
 #siteheader {
     height: 70px;
@@ -56,10 +51,20 @@ body {
 }
 
 #pageheader {
-    height: 300px;
+    height: 350px;
     font-color: #404040;
-    margin: 20px;
-    
+    background: -webkit-gradient(
+    linear,
+        left bottom,
+        left top,
+        color-stop(1, #65a9d7),
+        color-stop(.7, #96d1f8)
+    );
+    background: -moz-linear-gradient(
+        center bottom,
+        rgb(189,187,189) 100%,
+        #65a9d7 70%
+    );    
 }
 
 .button {
@@ -77,7 +82,6 @@ body {
    text-shadow: rgba(0,0,0,.4) 0 1px 0;
    color: white;
    font-size: 22px;
-   font-family: Georgia, serif;
    text-decoration: none;
    vertical-align: middle;
    width: 115px;
@@ -96,7 +100,8 @@ body {
 
 #title {
     font-size: 55px;
-    font-weight: bold;    
+    font-weight: bold; 
+    padding-top: 30px;   
 }
 
 #subtitle {
@@ -106,11 +111,9 @@ body {
     margin-bottom:40px;
 }
 
-
-
 #main_content {
     padding: 15px;
-    background: #FFFFFF;
+    background: #f7f7f7;
 }
 
 #tagcloud_wrapper {
@@ -140,8 +143,35 @@ body {
 }
 
 #frontpage_overview {
+    margin: 50px;
+}
+
+.overview_block {
+    width: 400px;
+    height: 150px;
     float: left;
-    width: 70%;
+    margin-top: 15px;
+    margin-bottom: 15px;
+    margin-left: 25px;
+    margin-right: 25px;
+}
+
+.overview_image {
+    width: 100px;
+    height: 70px;
+    float: left;
+}
+
+.overview_title {
+    width: 300px;
+    float: left;
+    font-size: 30px;    
+}
+.overview_text {
+    width: 300px;
+    float: left;
+    height: 115px;
+    font-size: 12px;    
 }
 
 #sidebar {
