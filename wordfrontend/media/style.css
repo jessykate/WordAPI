@@ -58,13 +58,14 @@ body {
         left bottom,
         left top,
         color-stop(1, #65a9d7),
-        color-stop(.7, #96d1f8)
+        color-stop(0, #ffffff   )
     );
     background: -moz-linear-gradient(
         center bottom,
-        rgb(189,187,189) 100%,
-        #65a9d7 70%
+        #65a9d7 100%,
+        #ffffff 0%
     );    
+    
 }
 
 .button {
