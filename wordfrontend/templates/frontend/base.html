@@ -12,14 +12,14 @@
 </head>
 
 <body>
-<div id="body">
-
-  <div id="siteheader">   
-    <div class="container">  
-      <div id="logo"> Word | API</div>
-      <div id="links"> <a href="/learn">Learn More</a> | <a href="/create">Create</a> | <a href="/examples">Gallery and Examples</a> | <a href="/browse">Browse</a> | <a href="/api">API</a> | <a href="/login">Log In</a></div>
-          </div>
+    <div id="siteheader">   
+      <div class="container">  
+        <div id="logo" onclick="location.href='{{ home_page }}';" style="cursor:pointer;">Word | API
+        </div>
+        <div id="links"> <a href="/learn">Learn More</a> | <a href="/create">Create</a> | <a href="/examples">Gallery and Examples</a> | <a href="/browse">Browse</a> | <a href="/api">API</a> | <a href="/login">Log In</a></div>
+        </div>
   </div>
+
   
 {% block welcome %}
 {% endblock %}
