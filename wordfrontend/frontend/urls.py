@@ -12,6 +12,6 @@ urlpatterns = patterns('',
   url(r'^browse', direct_to_template, {'template': 'frontend/browse.html'}),
   url(r'^api', direct_to_template, {'template': 'frontend/api.html'}),
 #  url(r'^login'),
-  url(r'^$', Index),
+  url(r'^$',  direct_to_template, {'template': 'frontend/index.html'}),
 
 )
