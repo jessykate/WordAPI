@@ -3,8 +3,8 @@ from django import forms
 # default is required = True
 class TagCloudForm(forms.Form):
     help_text = {
-        'body' : 'One of either "url", "body" or "freqs" fields are the minimum required field. Use the body field if you would like to type or paste your text inline (eg. into this box)',
-        'url' : 'One of either "url" or "body" or "freqs" fields are the minimum required field. Use the url field if you would like text from the specified url to be used for the tag cloud.',
+        'body' : 'Type or paste into the field below the text you would like to analyze.',
+        'url' : 'Use the url field if you would like text from the specified url to be analyzed.',
         'strip' : 'Strip any html markup. Default is True.',
         'max_size' : 'Maximum word size in px. Default is 70px.',
         'min_size' : 'Minimum word size in px. Default is 10px.',
@@ -15,13 +15,13 @@ class TagCloudForm(forms.Form):
         'normalize' : "this option will normalize the case of all words, making 'Hello' and 'hello' equivalent",
         'stopwords' : "Whether or not to remove (exclude) common english words (so-called 'stop words' from the tag cloud, such as 'the' and 'it'. Default is True.",
         'sort_order' : 'What order should the words be sorted in? Options are frequency, random, or alphabetical. In practice random seems to look best most of the time, but try different ones and see what you like.',
-        'freqs' : "Enter in a dictionary of word:frequency counts",
+        'freqs' : "Enter in a dictionary of word:frequency counts.",
     }
 
     allowed_sort_orders = [('random', 'random'), ('frequency', 'frequency'),
                            ('alphabetical', 'alphabetical (not implemented)')]
 
-    body = forms.CharField(widget=forms.Textarea(attrs={'rows':'20', 'cols':60 }), help_text = help_text['body'], required=False)
+    body = forms.CharField(widget=forms.Textarea(attrs={'rows':'10', 'cols':40 }), help_text = help_text['body'], required=False)
     url = forms.CharField(help_text = help_text['url'], required=False)
     freqs = forms.CharField(help_text = help_text['freqs'], required=False)
     max_words =  forms.IntegerField(help_text = help_text['max_words'], required=False)
