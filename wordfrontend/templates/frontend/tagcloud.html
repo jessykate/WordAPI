@@ -3,14 +3,132 @@
 
 {% block content %}
 
-<div>
-<em>Request types accepted:</em> GET, POST<br>
-<em>Minimum arguments required:</em> [ body | url ]<br>
-<em>Examples:</em>
-<p>{{ domain }}/api/1.0/tagcloud.json?body="big lotta text here"</p>
+<form action="" method="post">
+  <div id="step">
+    <div id="step_title">
+      Step 1: Select Source (select one)
+    </div>
+    {% csrf_token %}
+    <div id="step_option">
+      <div class="step_option_image">
+        <img src="/media/images/process.png">
+      </div>
+      <div class="step_option_title">
+        {{ tagcloud_form.url.label }}
+      </div>
+      <div class="step_option_help">
+        {{ tagcloud_form.url.help_text }}
+      </div>
+      <div class="step_option_input">
+        {{ tagcloud_form.url }}
+      </div>
+    </div>
+    <div id="step_option">
+      <div class="step_option_image">
+        <img src="/media/images/process.png">
+      </div>
+      <div class="step_option_title">
+        {{ tagcloud_form.body.label }}
+      </div>
+      <div class="step_option_help">
+        {{ tagcloud_form.body.help_text }}
+      </div>
+      <div class="step_option_input">
+        {{ tagcloud_form.body }}
+      </div>
+    </div>
+    <div id="step_option">
+      <div class="step_option_image">
+        <img src="/media/images/process.png">
+      </div>
+      <div class="step_option_title">
+        {{ tagcloud_form.freqs.label }}
+      </div>
+      <div class="step_option_help">
+        {{ tagcloud_form.freqs.help_text }}
+      </div>
+      <div class="step_option_input">
+        {{ tagcloud_form.freqs }}
+      </div>
+    </div>
+  </div>
+  <div id="step">
+   <div id="step_title">
+     Step 2: Customize Tagcloud
+   </div>
+   <div id="step_option">
+     <div class="step_option_title">
+       Tag Cloud Size
+     </div>
+     <br>
+     <div class="step_option_input">
+        {{ tagcloud_form.width.label }}: {{ tagcloud_form.width }}
+     </div>
+     <div class="step_option_help">
+       {{ tagcloud_form.width.help_text }}
+     </div>
+     <br>
+     <div class="step_option_input">
+       {{ tagcloud_form.height.label }}: {{ tagcloud_form.height }}
+     </div>
+     <div class="step_option_help">
+       {{ tagcloud_form.height.help_text }}
+     </div>
+    </div>
+    <div id="step_option">
+      <div class="step_option_title">
+        Text Size
+      </div>
+      <br>
+      <div class="step_option_input">
+         {{ tagcloud_form.max_size.label }}: {{ tagcloud_form.max_size }}
+      </div>
+      <div class="step_option_help">
+        {{ tagcloud_form.max_size.help_text }}
+      </div>
+      <br>
+      <div class="step_option_input">
+        {{ tagcloud_form.min_size.label }}: {{ tagcloud_form.min_size }}
+      </div>
+      <div class="step_option_help">
+        {{ tagcloud_form.min_size.help_text }}
+      </div>
+     </div>
+     <div id="step_option">
+       <div class="step_option_title">
+         Text Color
+       </div>
+       <br>
+       <div class="step_option_input">
+          {{ tagcloud_form.start_color.label }}: {{ tagcloud_form.start_color }}
+       </div>
+       <div class="step_option_help">
+         {{ tagcloud_form.start_color.help_text }}
+       </div>
+       <br>
+       <div class="step_option_input">
+         {{ tagcloud_form.end_color.label }}: {{ tagcloud_form.end_color }}
+       </div>
+       <div class="step_option_help">
+         {{ tagcloud_form.end_color.help_text }}
+       </div>
+       <br>
+       <div class="step_option_input">
+         {{ tagcloud_form.color_steps.label }}: {{ tagcloud_form.color_steps }}
+       </div>
+       <div class="step_option_help">
+         {{ tagcloud_form.color_steps.help_text }}
+       </div>
+      </div>
+   </div>
+  <div id="step">
+   <div id="step_title">
+     Step 3: Create Tagcloud
+   </div>
+   <input type="submit" value="Create Tag Cloud">
+   
+  </div>
 
-<p></p>
-</div>
 
 <form action="" method="post">
 {% csrf_token %}

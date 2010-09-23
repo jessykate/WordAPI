@@ -118,6 +118,58 @@ body {
     background: #eeeeee;
 }
 
+
+/*  TagCloud input */
+
+#step {
+    height: 300px;
+    margin-top: 20px;
+    margin-bottom: 20px;
+    
+}
+
+#step_title {
+    font-size: 36px;
+    margin-bottom: 10px;
+}
+
+#step_option {
+    width: 300px;
+    margin-left:15px;
+    margin-right:15px;
+    float:left;
+    
+}
+
+
+.step_option_image {
+    width: 75px;
+    height: 75px;
+    float: left;
+    
+}
+
+.step_option_title {
+    width: 225px;
+    float: left;
+    font-size: 28px;
+    
+}
+
+.step_option_help {
+    width: 225px;
+    float: left;
+    height: 50px;
+    font-size: 12px;
+    
+}
+
+.step_option_input {
+    width: 225px;
+    float: left;
+    
+}
+
 #tagcloud_wrapper {
     background: #ffffff;
     padding-top:30px;
