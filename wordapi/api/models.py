@@ -51,10 +51,8 @@ class Topic(object):
     update = None #static, manual, auto
     model = None # tfidf, regular freq, k-means...
     public = False
-    pass
 
 class Source(object):
     uri = None
     created = None
     updated = None
-    pass

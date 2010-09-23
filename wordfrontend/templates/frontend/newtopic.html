@@ -1,0 +1,81 @@
+{% extends "frontend/base.html" %}
+
+{% block custom_js %}
+var num_sources = 0;
+function addSource(divID, source_type) {
+    num_sources++;
+    var formDiv = document.getElementById(divID);
+    var newSource= document.createElement('div');
+    if (source_type == 'input') {
+        newSource.innerHTML = "Source " + num_sources + ": <input type='text' name='web_source_" + num_sources + "'>";
+    }
+    else if (source_type == 'file') {
+        newSource.innerHTML = "Source " + num_sources + ": <input type='file' name='file_source_" + num_sources + "'>";
+    }
+    formDiv.appendChild(newSource);
+}
+function removeSource(divID) {
+    if (num_sources == 1) {
+        return;
+    }
+    var formDiv = document.getElementById(divID);
+    var lastChild = formDiv.getElementsByTagName('div')[num_sources - 1];
+    formDiv.removeChild(lastChild);
+    num_sources--;
+}
+{% endblock %}
+
+{% block content %}
+<h2>Create a New Topic</h2>
+
+<div id="content">
+
+<div class="description">
+<p>A topic is something <b>you define</b>. It is a feed, a collection of
+documents, a webpage, or any other text source, that together represent a
+<b>common theme</b>.  When you define a topic, WordAPI will track those
+documents for you, and generate information and statistics which characterize
+your topic.</p> <p>Use your topic to visualize trends, classify new documents,
+or study changes over time. </p>
+<em>Hint: If you include dynamic sources, your topic will update when your sources do!</em>
+</div>
+
+<div class="input">
+
+<form action="" method="POST" enctype="multipart/form-data">
+{% csrf_token %}
+
+{% if topic_form %}
+{{ topic_form }}
+
+{% else %}
+
+Give your Topic a Name:<br>
+<input type="text" name="topic_name"><br>
+<div id="topic_sources">
+</div>
+<input type="button" id="add_web_source" value="Add an online source" onClick="addSource('topic_sources', 'input');">
+<input type="button" id="add_file_source" value="Add a file to upload" onClick="addSource('topic_sources', 'file');">
+<input type="button" id="removesource" value="Remove source" onClick="removeSource('topic_sources');">
+<br>Public [x] (all topics are currently public)<br>
+
+{% endif %}
+
+<input type="submit" value="Go!">
+</form>
+
+
+</div>
+
+</div>
+
+
+<div id="sidebar">
+{% include "glossary/topic.html" %}
+{% include "glossary/classifier.html" %}
+{% include "glossary/static.html" %}
+{% include "glossary/dynamic.html" %}
+</div>
+
+<div class="clear"></div>
+{% endblock %}

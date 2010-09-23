@@ -4,7 +4,7 @@ from django.shortcuts import render_to_response
 from django.template import RequestContext
 from django.http import HttpResponseRedirect
 from django.core.context_processors import csrf
-from frontend.forms import TagCloudForm
+from frontend.forms import TagCloudForm, NewTopicForm
 import urllib, httplib2, datetime
 import pymongo
 from pymongo.objectid import ObjectId
@@ -126,3 +126,39 @@ def cloud(request, cloud_id):
     record = collection.find_one({'_id':ObjectId(cloud_id)})
     return render_to_template(request, 'frontend/cloud.html', {'cloud':record})
 
+def new_topic(request):
+    #topic_form = NewTopicForm(request.POST)
+    if request.method == 'POST':
+        # get the fields and construct a form to match
+        form_data = request.POST
+        print form_data
+        topic_form = topic_form_generator(form_data)
+        return render_to_formtemplate(request, 'frontend/newtopic.html', {'topic_form': topic_form})
+        # ---> compute stats --> redirect to topic homepage<br>
+    else:
+        return render_to_formtemplate(request, 'frontend/newtopic.html')
+
+def topic_form_generator(form_data):
+    file_sources = 0
+    web_sources = 0
+    for k,v in form_data.iteritems():
+        if 'web_source' in k:
+            web_sources += 1
+        elif 'file_source' in k:
+            file_sources += 1
+    return NewTopicForm(form_data, file_sources=file_sources, 
+            web_sources=web_sources)
+
+
+def topic(request, topic_id):
+    # if !saved:
+    #   message: this topic has not yet been saved! click here to save
+    #vocab, wordcloud, graph of frequency<br>
+    #add a classifier<br>
+    pass
+
+def new_document(request):
+    pass
+
+def new_collection(request):
+    pass

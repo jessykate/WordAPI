@@ -13,6 +13,7 @@ body {
 
 .main_container {
     margin: 0px auto; 
+    padding: 20px;
     width:1000px;
     background: #ffffff;
 }
@@ -230,4 +231,18 @@ body {
     );
     border-top: 2px solid #96d1f8;
     font-size:12px;
-} 
+}
+
+.create:hover {
+       background: red;
+}
+
+.create {
+    background: none;   
+}
+
+a.block-link {
+    text-decoration: none;
+    color: #333333;
+}
+

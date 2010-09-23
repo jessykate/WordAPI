@@ -14,7 +14,12 @@
 
 <form action="" method="post">
 {% csrf_token %}
-{{ tagcloud_form.as_p }}
+
+{{ tagcloud_form.url.label }}
+{{ tagcloud_form.url }}
+{{ tagcloud_form.url.help_text }}
+
+
 <input type="submit" value="Create Tag Cloud">
 </form>
 
