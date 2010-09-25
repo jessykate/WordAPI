@@ -7,7 +7,6 @@
 {% block page_title %} - TagCloud{% endblock %}
 
 {% block custom_js %}
-<script type="text/javascript">
 $(document).ready(function() {
 
     $("#save-box").dialog({
@@ -32,7 +31,6 @@ $(document).ready(function() {
         $("#save-box").dialog("open");
     });
 });
-</script>
 {% endblock %}
 
 {% block content %}
@@ -56,14 +54,13 @@ update every time you visit it.</p>
 
 <div id="infobox">
 <div class=info" id="tagurl">
-This tag cloud was generated with the following (encoded) url:<br/>
+<p>This tag cloud was generated with the following (encoded) url:<br/>
 <a href="{{ generator_url }}">{{ generator_url_display|safe }}</a></p>
 </div>
 <div class="info">
 Create a short url for this cloud and share! 
 <button id="save-cloud">Save This Cloud</button>
 <a href="save">Static</a> | <a href="">Dynamic</a> (for url-based clouds only)
-</div>
 </div>
 </div>
 
