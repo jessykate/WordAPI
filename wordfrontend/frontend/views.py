@@ -26,10 +26,11 @@ def render_to_template(request, template, kwargs={}):
 
 
 
-def tagcloud(request):
+def new_document(request):
     if request.method == 'GET':
         form = TagCloudForm()
-        return render_to_formtemplate(request, 'frontend/tagcloud.html', {'domain': settings.ROOT_URL,'tagcloud_form' : form })
+        return render_to_formtemplate(request, 'frontend/newdoc.html', 
+                {'domain': settings.ROOT_URL,'tagcloud_form' : form })
 
     else:
         form = TagCloudForm(request.POST)
@@ -157,8 +158,8 @@ def topic(request, topic_id):
     #add a classifier<br>
     pass
 
-def new_document(request):
-    pass
+#def new_document(request):
+#    pass
 
 def new_collection(request):
     pass

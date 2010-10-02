@@ -9,7 +9,6 @@ urlpatterns = patterns('',
     url(r'^browse', direct_to_template, {'template': 'frontend/browse.html'}),
     url(r'^api', direct_to_template, {'template': 'frontend/api.html'}),
 
-    url(r'^tagcloud$', tagcloud),
     url(r'^cloud/(?P<cloud_id>\w+)', cloud),
     url(r'^save$', save),
     url(r'^topic/new$', new_topic),

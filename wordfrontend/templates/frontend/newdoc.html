@@ -1,14 +1,73 @@
 {% extends "frontend/base.html" %}
 
+{% block custom_js %}
+{% endblock %}
+function toggle_option(div_id) {
+    var url_input = document.getElementById("url_input");
+    var file_input = document.getElementById("file_input");
+    var text_input = document.getElementById("text_input");
+
+    var inputs = ['url_input', 
+    for (var i in inputs) {
+        if i == div_id: 
+    }
+
+}
 
 {% block content %}
 
-<form action="" method="post">
+<form action="" method="post"> {% csrf_token %}
   <div id="step">
     <div id="step_title">
-      Step 1: Select Source (select one)
+      <h2>Step 1: Choose a Source Document</h2>
     </div>
-    {% csrf_token %}
+
+    <div id="step_option">
+      <div class="step_option_image">
+        <img src="/media/images/process.png">
+      </div>
+      <div class="step_option_title"> 
+      <span onclick="toggle_option('url_input')">Url</span> | 
+      <span onclick="toggle_option('file_input')">File Upload</span> | 
+      <span onclick="toggle_option('text_input')">Text Input</span>
+      </div>
+      
+      <div class="option_fields" id="url_input">  
+      <div class="step_option_help">
+        {{ tagcloud_form.url.help_text }}
+      </div>
+      <div class="step_option_input">
+        {{ tagcloud_form.url }}
+      </div>
+      </div>
+ 
+      <div class="option_fields" id="file_input">  
+      <div class="step_option_help">
+        {{ tagcloud_form.url.help_text }}
+      </div>
+      <div class="step_option_input">
+        {{ tagcloud_form.url }}
+      </div>
+      </div>
+
+      <div class="option_fields" id="text_input">  
+      <div class="step_option_help">
+        {{ tagcloud_form.body.help_text }}
+      </div>
+      <div class="step_option_input">
+        {{ tagcloud_form.body }}
+      </div>
+      </div>
+
+    </div>
+ 
+<div class="clear"></div>
+<br><br>
+<br><br>
+<br><br>
+
+<!-------------- -->
+
     <div id="step_option">
       <div class="step_option_image">
         <img src="/media/images/process.png">
@@ -141,4 +200,17 @@
 <input type="submit" value="Create Tag Cloud">
 </form>
 
+<script>
+function hide_initial() {
+    var url_input = document.getElementById("url_input");
+    var file_input = document.getElementById("file_input");
+    var text_input = document.getElementById("text_input");
+    url_input.style.display="none";
+    file_input.style.display="none";
+    text_input.style.display="none";
+}
+$(document).ready(hide_initial());
+
+
+</script>
 {% endblock %}
