@@ -1,5 +1,4 @@
-# Django settings for wordapi project.
-
+# Django settings for wordfrontend project.
 import os
 
 PROJECT_ROOT = os.path.abspath(os.path.dirname(__file__))
@@ -49,20 +48,21 @@ USE_L10N = True
 
 # Absolute path to the directory that holds media.
 # Example: "/home/media/media.lawrence.com/"
-MEDIA_ROOT = ''
+MEDIA_ROOT = os.path.join(PROJECT_ROOT, 'media')
+
 
 # URL that handles the media served from MEDIA_ROOT. Make sure to use a
 # trailing slash if there is a path component (optional in other cases).
 # Examples: "http://media.lawrence.com", "http://example.com/media/"
-MEDIA_URL = ''
+MEDIA_URL = '/media/'
 
 # URL prefix for admin media -- CSS, JavaScript and images. Make sure to use a
 # trailing slash.
 # Examples: "http://foo.com/media/", "/media/".
-ADMIN_MEDIA_PREFIX = '/media/'
+ADMIN_MEDIA_PREFIX = '/some-other-url/'
 
 # Make this unique, and don't share it with anybody.
-SECRET_KEY = '8_ej_7unqynwmw@8gs-ohsedbo2y7=f)_&i$uc^5sn!80bf^^w'
+SECRET_KEY = '_yd7l@-qau&@3%7mj-g7j*#uw^ke9es%hkrpd#v4fft_6or5n('
 
 # List of callables that know how to import templates from various sources.
 TEMPLATE_LOADERS = (
@@ -78,7 +78,7 @@ MIDDLEWARE_CLASSES = (
     # csrf_token. since we don't have that, disable this middleware. see
     # http://bitbucket.org/jespern/django-piston/issue/82/post-requests-fail-when-using-django-trunk
     # for more info. 
-    #'django.middleware.csrf.CsrfViewMiddleware',
+    # 'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'piston.middleware.CommonMiddlewareCompatProxy',
@@ -87,11 +87,17 @@ MIDDLEWARE_CLASSES = (
 
 ROOT_URLCONF = 'wordapi.urls'
 
+TEMPLATE_CONTEXT_PROCESSORS = ('frontend.context_processors.base_context',
+                                'django.core.context_processors.auth', 
+                                'django.core.context_processors.debug',
+                                'django.core.context_processors.i18n',
+                                )    
+
 TEMPLATE_DIRS = (
     # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
-    os.path.join(PROJECT_ROOT, 'templates'),	
+    os.path.join(PROJECT_ROOT, 'templates'),
 )
 
 INSTALLED_APPS = (
@@ -99,7 +105,8 @@ INSTALLED_APPS = (
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.sites',
-    'django.contrib.messages',    
+    'django.contrib.messages',
+    'wordapi.frontend',
     'wordapi.api',
     # Uncomment the next line to enable the admin:
     # 'django.contrib.admin',
@@ -109,4 +116,3 @@ try:
     from local_settings import *
 except:
     pass
-
