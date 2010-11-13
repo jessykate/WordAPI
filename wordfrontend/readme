@@ -2,3 +2,5 @@ Dependencies
 
 * mongodb
 * pymongo
+* poster (facilitate HTTP POST requests using the standard multipart/form-data encoding)
+  http://atlee.ca/software/poster/

@@ -1,7 +1,7 @@
 from piston.handler import BaseHandler
 from piston.utils import rc
 import nltk, urllib, urllib2
-import urllib, random
+import random, math
 from lib import html_unescape
 try:
     import json
@@ -47,23 +47,13 @@ class GeneralHandler(BaseHandler):
 		thisarg = urllib.unquote(request.GET.get(arg))
                 self.kwargs[arg] = thisarg
 
-        #print 'kwargs:'
-        #print self.kwargs
-        # each handler defines an 'execute' function that calls the
-        # main work function with arguments stored in the class
-        # attributes. might simply call some other function, or can
-        # contain the work itself. the former would look something
-        # like:
-        #
-        # def execute(self):
-        #     work_func(self.fargs[0], ... self.fargs[n], *self.kwargs)
-        # 
 	return self.execute()
 
     def create(self, request):
         ''' mirrors the functionality implemented by read(), for POST
         requests.'''
         print 'in "create"'
+        print request.FILES
         self.fargs = []
         for arg in self.args_required:
             if not request.POST.get(arg, None):
@@ -71,7 +61,13 @@ class GeneralHandler(BaseHandler):
                 resp.write(': Missing Required Parameter "%s"' % arg)
                 return resp
             else:
-                thisarg = urllib.unquote_plus(request.POST.get(arg))
+                # assumes only that a single file will be uploaded and it's
+                # field name in the form will be 'file'. XXX TODO make this
+                # more robust. 
+                if arg == 'file':
+                    thisarg = request.FILES['file']
+                else:
+                    thisarg = urllib.unquote_plus(request.POST.get(arg))
                 self.fargs.append(thisarg)
         
         self.kwargs = {}
@@ -80,15 +76,6 @@ class GeneralHandler(BaseHandler):
                 thisarg = urllib.unquote(request.POST.get(arg))
                 self.kwargs[arg] = thisarg
 
-        #print 'kwargs'
-        #print self.kwargs
-        #print ''
-        #print 'fargs'
-        #print self.fargs
-
-        # each handler defines an 'execute' function that calls the
-        # main work function with arguments stored in the class
-        # attributes
         return self.execute()
 
 
@@ -208,30 +195,64 @@ def color_scheme(color_a=None, color_b=None, total_steps=5):
 
     return palette
 
+def quadratic_equation(a,b,c):
+    a = float(a)
+    b = float(b)
+    c = float(c)
+    x1 = (-b + math.sqrt(pow(b,2.0) - 4.0*a*c))/2.0*a
+    x2 = (-b - math.sqrt(pow(b,2.0) - 4.0*a*c))/2.0*a
+    return x1,x2
 
-def tag_cloud(dist, id_ = "", class_ = "", width=None, height=None, 
-              max_size=70, min_size=10, max_words = None, 
-              start_color=None, end_color=None, color_steps=None, 
-              sort_order="random"):
-    ''' returns a dict with style and body elements. style contains
-    defalt styling for the tag cloud, while body contains the html
-    markup. '''
+def fit_to_area(width, height, dist, font):
 
-    # sort() returns a list of tuples in order of decreasing frequency 
-    dist = sort(dist) 
+    # add a 10% buffer to the area we fill:
+    w = 0.9*width
+    h = 0.9*height
+
+    # there is the mild problem that a given font's true size in pixels often
+    # actually takes up more or less pixels than its 'font size'. so we need to
+    # figure out an effective width and height by converting to specific font
+    # units. 
+    
+
+    # calculate the number of times a frequency occurs
+    freqs = {}
+    for word, freq in dist:
+        freqs[freq] = freqs.get(freq, 0) + 1
+
+    # equation of the line: y = mx + b; m=1
+    # to calculate area width * height in px^2:
+    # width * height = sum over i: n_i*(f_i + b)^2
+    # where we want to solve for b, the intercept of the line.
+    # each i'th term implifies to:
+    # nf^2 + 2nfb + nb^2
+    # we compute the sum and collect like terms, ending with 
+    # a polynomial of the form:
+    # a1 + a2*b + a3*b^2 = width*height
+    # (a1 - width*height) + a2*b + a3b^2 = 0
+    # and then use the quadratic equation to solve for b. 
+    a1 = -(w*h)
+    a2 = a3 = 0
+    for f, n in freqs.iteritems():
+        a1 += n*pow(f,2.0)
+        a2 += 2*n*f
+        a3 += n
+
+    # solve for b using quadratic formula
+    b1,b2 = quadratic_equation(a1,a2,a3)
+
+    if b1>b2: 
+        b = b1
+    else: b = b2
+
+    font_size_fn = lambda freq: freq+b
+    return font_size_fn
+
+def min_max_extrapolate(dist, max_size, min_size):
     # explicitly set the indices where the min and max values can be found in
     # the dist list. 
     MAX = 0
     MIN = -1
-
-    # truncate the list of items if max_words was specified
-    if max_words:
-        max_words = int(max_words)
-        dist = dist[:max_words]            
-
-    # get the equation of the line between min_size and max_size. do this AFTER
-    # truncating to max_words and BEFORE shuffling the order around.  
-
     # y = mx+b --> max_size = m*max_freq + b, min_size = m*min_freq + b.
     # max_size - min_size = m (max_freq - min_freq) 
     # --> m = (max_size - min_size)/(max_freq - min_freq)
@@ -240,19 +261,53 @@ def tag_cloud(dist, id_ = "", class_ = "", width=None, height=None,
     max_size = float(max_size)
     min_size = float(min_size)
     # if they're all the same frequency, everything is the same size. use the
-    # mid-point between max_size and min_size (it's left as a function so we
-    # can use it easily in place of a dynamic value below). 
+    # mid-point between max_size and min_size (it's still built as a function 
+    # so we can use it easily in place of a dynamic value). 
     if max_freq == min_freq:
-        font_size = lambda freq: (max_size + min_size)/2
+        font_size_fn = lambda freq: (max_size + min_size)/2.0
     else:
         m = (max_size - min_size)/(max_freq - min_freq)
         b = max_size - m*max_freq
-        font_size = lambda freq: m*freq+b
+        font_size_fn = lambda freq: m*freq+b
+
+    return font_size_fn
+
+def tag_cloud(dist, id_ = "", class_ = "", width=None, height=None, 
+              max_size=None, min_size=None, max_words = None, 
+              start_color=None, end_color=None, color_steps=None, 
+              sort_order="random"):
+    ''' returns a dict with style and body elements. style contains
+    defalt styling for the tag cloud, while body contains the html
+    markup. '''
+
+    # sort() returns a list of tuples in order of decreasing frequency 
+    dist = sort(dist) 
+    
+    # truncate the list of items if max_words was specified
+    if max_words:
+        max_words = int(max_words)
+        dist = dist[:max_words]            
+
+    # get the equation of the line
+    max_size = 70;
+    min_size = 10;
+    if max_size and min_size:
+        font_size_fn = min_max_extrapolate(dist, max_size, min_size)
+    else:
+        if not (width and height):
+            width = 600
+            height = 800
+        font = 'times new roman'
+        font_size_fn = fit_to_area(width, height, dist, font)
+        print font_size_fn
+
+    # get the equation of the line between min_size and max_size. do this AFTER
+    # truncating to max_words and BEFORE shuffling the order around.  
 
     # determine the sort order. if the sort order is frequency, there's nothing
     # to do since the distribution object is already sorted by frequency. 
     if sort_order not in ['random', 'frequency', 'alphabetical']:
-        print 'invalid sort orderi; using default = random'
+        print 'invalid sort order; using default = random'
         sort_order = 'random'
 
     if sort_order == 'random':
@@ -304,11 +359,11 @@ def tag_cloud(dist, id_ = "", class_ = "", width=None, height=None,
         color = colors[color_index]
     	style += ('''
 .%s {padding-left: 15px; padding-right: 15px; font-size: %s; color: %s }''' 
-% (freq_as_word, font_size(f), color))
+% (freq_as_word, font_size_fn(f), color))
     style += '''
 </style>'''
-    #print 'style portion'
-    #print style
+    print 'style portion'
+    print style
     resp =  {'body': body, 'style': style}
     return resp
 
@@ -363,6 +418,13 @@ class TagCloudBaseHandler(GeneralHandler):
     def execute(self):
         pass
 
+    def escape_text(self, raw_text, encoding=None):
+        if not encoding:
+            encoding = 'utf8'
+        #ustring = unicode(raw_text, encoding, 'ignore')
+        ustring = html_unescape(raw_text)
+        return ustring
+
     def get_text(self):
         # return the actual contents to be used in the tag cloud. implemented
         # by child class, depending on the call type-- eg. in-line or url
@@ -415,7 +477,7 @@ class TagCloudBodyHandler(TagCloudBaseHandler):
     args_required = ['body']
 
     def get_text(self):
-        return self.fargs[0]
+        return self.escape_text(self.fargs[0])
 
     def execute(self):
         tokens = self.get_tokens()
@@ -423,12 +485,32 @@ class TagCloudBodyHandler(TagCloudBaseHandler):
         return self.get_cloud(freq)
 
 
+class TagCloudFileHandler(TagCloudBaseHandler):
+    # 'file' becomes fargs[0] in the parent class's execute() method
+    print 'in file handler'
+    args_required = ['file']
+
+    def get_text(self):
+        fp = self.fargs[0]
+        print fp
+        # assumes file is small enough to fit into memory..
+        tmp_file = ''
+        for chunk in fp.chunks():
+            tmp_file += chunk
+        return self.escape_text(tmp_file)
+
+    def execute(self):
+        tokens = self.get_tokens()
+        freq = self.get_freqdist(tokens)
+        return self.get_cloud(freq)
+
 class TagCloudUrlHandler(TagCloudBaseHandler):
     # 'url' becomes fargs[0] in the parent class's execute() method
     args_required = ['url']
 
     def get_text(self):
-        # the text to be analyzed is passed in via a url, so we need to retrieve it
+        # the text to be analyzed is passed in via a url, so we need to
+        # retrieve it
         url = self.fargs[0]
         if not url.startswith('http://'):
             url = 'http://'+url

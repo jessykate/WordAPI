@@ -5,6 +5,7 @@ class TagCloudForm(forms.Form):
     help_text = {
         'body' : 'Paste your text inline (eg. into this box)',
         'url' : 'Retrieve text from the specified url.',
+        'file' : 'Upload a file',
         'freqs' : "Enter in a dictionary of word:frequency counts",
         'strip' : 'Strip any html markup. Default is True.',
         'max_size' : 'Maximum word size (px). Default 70px.',
@@ -23,7 +24,9 @@ class TagCloudForm(forms.Form):
 
     body = forms.CharField(widget=forms.Textarea(attrs={'rows':'20', 'cols':60 }), help_text = help_text['body'], required=False)
     url =           forms.CharField(help_text = help_text['url'], required=False)
-    freqs =         forms.CharField(help_text = help_text['freqs'], required=False)
+    file =          forms.FileField(help_text = help_text['file'], required=False)
+    # this is an option in the API but not likely to be useful in the frontend
+    #freqs =         forms.CharField(help_text = help_text['freqs'], required=False)
     max_words =     forms.IntegerField(help_text = help_text['max_words'], required=False)
     start_color =   forms.CharField(required=False)
     end_color =     forms.CharField(required=False)
@@ -44,11 +47,11 @@ class TagCloudForm(forms.Form):
         cleaned_data = self.cleaned_data
         url = cleaned_data.get('url')
         body = cleaned_data.get('body')
-        freqs = cleaned_data.get('freqs')
-        if not url and not body and not freqs:
-            raise forms.ValidationError('You must specify one of "url", "body" or "freqs" fields')
-        if (url and body) or (url and freqs) or (body and freqs):
-            raise forms.ValidationError('Specify only one of "url" or "body" or "freqs" fields')
+        file = cleaned_data.get('file')
+        if not url and not body and not file:
+            raise forms.ValidationError('You must specify one of "url", "body" or "file" fields')
+        if (url and body) or (url and file) or (body and file):
+            raise forms.ValidationError('Specify only one of "url" or "body" or "file" fields')
 
         start_color = cleaned_data.get('start_color')
         end_color = cleaned_data.get('end_color')

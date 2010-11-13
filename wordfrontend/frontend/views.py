@@ -2,7 +2,7 @@
 from django.conf import settings
 from django.shortcuts import render_to_response
 from django.template import RequestContext
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, HttpResponse
 from django.core.context_processors import csrf
 from frontend.forms import TagCloudForm, NewTopicForm
 import urllib, httplib2, datetime
@@ -33,7 +33,8 @@ def new_document(request):
                 {'domain': settings.ROOT_URL,'tagcloud_form' : form })
 
     else:
-        form = TagCloudForm(request.POST)
+        form = TagCloudForm(request.POST, request.FILES)
+        print request.FILES
         # validation function just checks required fields for now, but later should
         # probably validate tokenizer regular expressions etc. 
         if form.is_valid(): 
@@ -43,21 +44,38 @@ def new_document(request):
                 if value:
                     args[field] = value
             
-            if 'body' in args:
+            if 'file' in args:
+                url = settings.ROOT_URL + "/api/1.0/tagcloud/file.json"
+                fp = request.FILES['file']
+                tmp_file = ''
+                for chunk in fp.chunks():
+                    tmp_file += chunk 
+                args['file'] = tmp_file
+
+            elif 'body' in args:
                 url = settings.ROOT_URL + "/api/1.0/tagcloud/body.json"
+                #  normalize the character encoding on any input text
+                args['body'] = args['body'].encode('ascii', 'replace')
+
             elif 'freqs' in args:
                 url = settings.ROOT_URL + "/api/1.0/tagcloud/freq.json"
             else: # this is a 'url' call
                 url = settings.ROOT_URL + "/api/1.0/tagcloud/url.json"
 
-            headers = {'Content-type': 'application/x-www-form-urlencoded'}
+            headers = {'Content-type': 'application/x-www-form-urlencoded',
+                        'enctype': 'enctype="multipart/form-data"'}
             data = urllib.urlencode(args)
             http = httplib2.Http()
             print 'about to make api call to %s' % url
+            print url + '?' + data
             response, content = http.request(url, 'POST', headers=headers, body=data)
-            js = json.loads(content)
-            body = js['body']
-            style = js['style']
+            try:
+                js = json.loads(content)
+                body = js['body']
+                style = js['style']
+            except:
+                return HttpResponse('<b>API Error</b><br><br>'+content)
+                return
 
             # replace the full body text with placeholder text, and then pass
             # the API call url to the template so the user can see what was
@@ -84,7 +102,7 @@ def new_document(request):
             print request.POST
             print 'Form did not validate'
             form = TagCloudForm(request.POST)
-            return render_to_formtemplate(request, 'frontend/tagcloud.html', 
+            return render_to_formtemplate(request, 'frontend/newdoc.html', 
                                         {'domain': settings.ROOT_URL,
                                         'tagcloud_form' : form
                                         })

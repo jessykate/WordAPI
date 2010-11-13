@@ -16,58 +16,8 @@ function toggle_option(div_id) {
 
 {% block content %}
 
-<form action="" method="post"> {% csrf_token %}
+<form action="" method="post" enctype="multipart/form-data"> {% csrf_token %}
   <div id="step">
-    <div id="step_title">
-      <h2>Step 1: Choose a Source Document</h2>
-    </div>
-
-    <div id="step_option">
-      <div class="step_option_image">
-        <img src="/media/images/process.png">
-      </div>
-      <div class="step_option_title"> 
-      <span onclick="toggle_option('url_input')">Url</span> | 
-      <span onclick="toggle_option('file_input')">File Upload</span> | 
-      <span onclick="toggle_option('text_input')">Text Input</span>
-      </div>
-      
-      <div class="option_fields" id="url_input">  
-      <div class="step_option_help">
-        {{ tagcloud_form.url.help_text }}
-      </div>
-      <div class="step_option_input">
-        {{ tagcloud_form.url }}
-      </div>
-      </div>
- 
-      <div class="option_fields" id="file_input">  
-      <div class="step_option_help">
-        {{ tagcloud_form.url.help_text }}
-      </div>
-      <div class="step_option_input">
-        {{ tagcloud_form.url }}
-      </div>
-      </div>
-
-      <div class="option_fields" id="text_input">  
-      <div class="step_option_help">
-        {{ tagcloud_form.body.help_text }}
-      </div>
-      <div class="step_option_input">
-        {{ tagcloud_form.body }}
-      </div>
-      </div>
-
-    </div>
- 
-<div class="clear"></div>
-<br><br>
-<br><br>
-<br><br>
-
-<!-------------- -->
-
     <div id="step_option">
       <div class="step_option_image">
         <img src="/media/images/process.png">
@@ -87,30 +37,32 @@ function toggle_option(div_id) {
         <img src="/media/images/process.png">
       </div>
       <div class="step_option_title">
+        {{ tagcloud_form.file.label }}
+      </div>
+      <div class="step_option_help">
+        {{ tagcloud_form.file.help_text }}
+      </div>
+      <div class="step_option_input">
+        {{ tagcloud_form.file }}
+      </div>
+    </div>
+    <div class="clear"></div>
+    <div id="step_option">
+      <div class="step_option_image">
+        <img src="/media/images/process.png">
+      </div>
+      <div class="step_option_title">
         {{ tagcloud_form.body.label }}
       </div>
       <div class="step_option_help">
         {{ tagcloud_form.body.help_text }}
       </div>
       <div class="step_option_input">
-        {{ tagcloud_form.body }}
-      </div>
-    </div>
-    <div id="step_option">
-      <div class="step_option_image">
-        <img src="/media/images/process.png">
-      </div>
-      <div class="step_option_title">
-        {{ tagcloud_form.freqs.label }}
-      </div>
-      <div class="step_option_help">
-        {{ tagcloud_form.freqs.help_text }}
-      </div>
-      <div class="step_option_input">
-        {{ tagcloud_form.freqs }}
+        {{ tagcloud_form.body }} 
       </div>
     </div>
   </div>
+  <div class="clear"></div>
   <div id="step">
    <div id="step_title">
      Step 2: Customize Tagcloud
@@ -152,7 +104,13 @@ function toggle_option(div_id) {
       <div class="step_option_help">
         {{ tagcloud_form.min_size.help_text }}
       </div>
-     </div>
+      <div class="step_option_input">
+        {{ tagcloud_form.max_words.label }}: {{ tagcloud_form.max_words }}
+      </div>
+      <div class="step_option_help">
+        {{ tagcloud_form.max_words.help_text }}
+      </div>
+      </div>
      <div id="step_option">
        <div class="step_option_title">
          Text Color
@@ -191,11 +149,6 @@ function toggle_option(div_id) {
 
 <form action="" method="post">
 {% csrf_token %}
-
-{{ tagcloud_form.url.label }}
-{{ tagcloud_form.url }}
-{{ tagcloud_form.url.help_text }}
-
 
 <input type="submit" value="Create Tag Cloud">
 </form>
