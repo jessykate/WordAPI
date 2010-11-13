@@ -1,6 +1,6 @@
 from django.conf.urls.defaults import patterns, url
 from django.views.generic.simple import direct_to_template
-from wordapi.frontend.views import *
+from frontend.views import *
 
 urlpatterns = patterns('',
     url(r'^learn', direct_to_template, {'template': 'frontend/learn.html'}),

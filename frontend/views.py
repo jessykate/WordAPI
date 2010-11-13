@@ -30,7 +30,7 @@ def new_document(request):
     if request.method == 'GET':
         form = TagCloudForm()
         return render_to_formtemplate(request, 'frontend/newdoc.html', 
-                {'domain': settings.ROOT_URL,'tagcloud_form' : form })
+                {'domain': settings.API_URL,'tagcloud_form' : form })
 
     else:
         form = TagCloudForm(request.POST, request.FILES)
@@ -45,7 +45,7 @@ def new_document(request):
                     args[field] = value
             
             if 'file' in args:
-                url = settings.ROOT_URL + "/api/1.0/tagcloud/file.json"
+                url = settings.API_URL + "/api/1.0/tagcloud/file.json"
                 fp = request.FILES['file']
                 tmp_file = ''
                 for chunk in fp.chunks():
@@ -53,14 +53,14 @@ def new_document(request):
                 args['file'] = tmp_file
 
             elif 'body' in args:
-                url = settings.ROOT_URL + "/api/1.0/tagcloud/body.json"
+                url = settings.API_URL + "/api/1.0/tagcloud/body.json"
                 #  normalize the character encoding on any input text
                 args['body'] = args['body'].encode('ascii', 'replace')
 
             elif 'freqs' in args:
-                url = settings.ROOT_URL + "/api/1.0/tagcloud/freq.json"
+                url = settings.API_URL + "/api/1.0/tagcloud/freq.json"
             else: # this is a 'url' call
-                url = settings.ROOT_URL + "/api/1.0/tagcloud/url.json"
+                url = settings.API_URL + "/api/1.0/tagcloud/url.json"
 
             headers = {'Content-type': 'application/x-www-form-urlencoded',
                         'enctype': 'enctype="multipart/form-data"'}
@@ -103,7 +103,7 @@ def new_document(request):
             print 'Form did not validate'
             form = TagCloudForm(request.POST)
             return render_to_formtemplate(request, 'frontend/newdoc.html', 
-                                        {'domain': settings.ROOT_URL,
+                                        {'domain': settings.API_URL,
                                         'tagcloud_form' : form
                                         })
 

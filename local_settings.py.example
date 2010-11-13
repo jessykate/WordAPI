@@ -1,0 +1,6 @@
+API_URL = "http://localhost:8712"
+HOME_PAGE = "http://localhost:9999"
+
+# for creating tinyurls for tag clouds
+BITLY_USER = "your bitly username"
+BITLY_KEY = "your bitly key"

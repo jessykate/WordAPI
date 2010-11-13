@@ -10,7 +10,7 @@ urlpatterns = patterns('',
     # (r'^wordfrontend/', include('wordfrontend.foo.urls')),
     url(r'^%s/(?P<path>.*)$' % settings.MEDIA_URL.strip('/'), 
         'django.views.static.serve', {'document_root': settings.MEDIA_ROOT }),
-    (r'^api/1.0/', include('wordapi.api.urls')),
+    (r'^api/1.0/', include('api.urls')),
     (r'^', include('frontend.urls')),
 
     # Uncomment the admin/doc line below and add 'django.contrib.admindocs' 
