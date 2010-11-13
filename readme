@@ -1,6 +1,5 @@
-Dependencies
+A web service for document and topic analysis offering both an API and a frontend. 
 
-* mongodb
-* pymongo
-* poster (facilitate HTTP POST requests using the standard multipart/form-data encoding)
-  http://atlee.ca/software/poster/
+
+
+

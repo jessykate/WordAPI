@@ -1,5 +1,9 @@
+mongodb
+pymongo
+# poster (facilitate HTTP POST requests using the standard multipart/form-data encoding)
+http://atlee.ca/software/poster/
 django 1.2 or above
 django-piston
 nltk
-nltk's stopwords data: 
+# nltk's stopwords data: 
 sudo python -m nltk.downloader -d /usr/share/nltk_data all
