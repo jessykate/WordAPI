@@ -80,27 +80,7 @@ def new_document(request):
                 return HttpResponse('<b>API Error</b><br><br>'+content)
                 return
 
-            # replace the full body text with placeholder text, and then pass
-            # the API call url to the template so the user can see what was
-            # done. 
-            control_params = args
-            if 'body' in args:
-                control_params['body'] = "your text here"
-            generator_url = url + '?' + urllib.urlencode(control_params)
-
-            # tell the browser where it can insert a line break
-            generator_url_display = generator_url.replace('&', '<wbr>&')
-
-            print type(content)
-            # note that in the template, body and style need to be given the 'safe'
-            # filter so that the markup will be interpreted. otherwise it will be
-            # escaped and displayed as strings.
             return HttpResponseRedirect("/cloud/%s" % cloud_id)
-            return render_to_formtemplate(request, 'frontend/tagcloud_display.html', {'body' : body,
-                                        'style' : style, 'generator_url' : generator_url,
-                                        'generator_url_display': generator_url_display, 
-                                        'tagcloud_json': content, 'tagcloud_form': form,
-                                        'max_words_max': 200}) #stubbed out values
         else:
             print request.POST
             print 'Form did not validate'
@@ -114,7 +94,17 @@ def cloud(request, cloud_id):
     con = pymongo.Connection()
     collection = con.wordapi.tagclouds
     record = collection.find_one({'_id':ObjectId(cloud_id)})
-    return render_to_template(request, 'frontend/cloud.html', {'cloud':record})
+    # XXX TODO this needs to be its own form, not the tag cloud form. 
+    form = TagCloudForm()
+
+    #generator_url = url + '?' + urllib.urlencode(control_params)
+    # tell the browser where it can insert a line break
+    #generator_url_display = generator_url.replace('&', '<wbr>&')
+
+     # note that in the template, body and style need to be given the 'safe'
+    # filter so that the markup will be interpreted. otherwise it will be
+    # escaped and displayed as strings.
+    return render_to_template(request, 'frontend/cloud.html', {'cloud':record, 'update_form':form})
 
 def new_topic(request):
     #topic_form = NewTopicForm(request.POST)
