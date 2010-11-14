@@ -22,7 +22,7 @@ class TagCloudForm(forms.Form):
     allowed_sort_orders = [('random', 'random'), ('frequency', 'frequency'),
                            ('alphabetical', 'alphabetical (not implemented)')]
 
-    body = forms.CharField(widget=forms.Textarea(attrs={'rows':'20', 'cols':60 }), help_text = help_text['body'], required=False)
+    body = forms.CharField(widget=forms.Textarea(attrs={'rows':'20', 'cols':60 }), help_text = help_text['body'], required=False, label="Text")
     url =           forms.CharField(help_text = help_text['url'], required=False)
     file =          forms.FileField(help_text = help_text['file'], required=False)
     # this is an option in the API but not likely to be useful in the frontend

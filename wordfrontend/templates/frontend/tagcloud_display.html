@@ -7,6 +7,7 @@
 {% block page_title %} - TagCloud{% endblock %}
 
 {% block custom_js %}
+<script type="text/javascript">
 $(document).ready(function() {
 
     $("#save-box").dialog({
@@ -31,6 +32,7 @@ $(document).ready(function() {
         $("#save-box").dialog("open");
     });
 });
+</script>
 {% endblock %}
 
 {% block content %}

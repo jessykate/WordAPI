@@ -1,67 +1,76 @@
 {% extends "frontend/base.html" %}
 
 {% block custom_js %}
-{% endblock %}
-function toggle_option(div_id) {
-    var url_input = document.getElementById("url_input");
-    var file_input = document.getElementById("file_input");
-    var text_input = document.getElementById("text_input");
-
-    var inputs = ['url_input', 
-    for (var i in inputs) {
-        if i == div_id: 
+<script type="text/javascript">
+window.selectIngest = function(clickedSelector, ingestInputToShow){
+  // select the correct ingest-selector
+  var ingestSelectors = jQuery('#ingest-selector-container').children('a.ingest-selector');
+  jQuery.each(ingestSelectors, function(i, currSelector){
+    if (currSelector == clickedSelector) {
+      jQuery(currSelector).addClass("selected");
+    } else {
+      jQuery(currSelector).removeClass("selected");
     }
-
-}
+  });
+  // Show the correct input
+  var ingestInputs = ['#url-ingest', '#file-ingest', '#text-ingest'];
+  jQuery.each(ingestInputs, function(i, currIngestInput){
+    var shouldShow = ingestInputToShow == currIngestInput;
+    jQuery(currIngestInput).toggle(shouldShow);
+  });
+};
+</script>
+{% endblock %}
 
 {% block content %}
 
-<form action="" method="post" enctype="multipart/form-data"> {% csrf_token %}
-  <div id="step">
-    <div id="step_option">
-      <div class="step_option_image">
-        <img src="/media/images/process.png">
-      </div>
-      <div class="step_option_title">
+  <div id="ingest-selector-container">
+    <a href="#" class="ingest-selector selected" onclick="selectIngest(this, '#url-ingest'); return false;">
+      <img src="/media/images/process.png">
+      <h3>
         {{ tagcloud_form.url.label }}
-      </div>
-      <div class="step_option_help">
+      </h3>
+      <div class="detail-text">
         {{ tagcloud_form.url.help_text }}
-      </div>
-      <div class="step_option_input">
-        {{ tagcloud_form.url }}
-      </div>
-    </div>
-    <div id="step_option">
-      <div class="step_option_image">
-        <img src="/media/images/process.png">
-      </div>
-      <div class="step_option_title">
+      </div>    
+    </a>
+    <a href="#" class="ingest-selector" onclick="selectIngest(this, '#file-ingest'); return false;">
+      <img src="/media/images/process.png">
+      <h3>
         {{ tagcloud_form.file.label }}
-      </div>
-      <div class="step_option_help">
+      </h3>
+      <div class="detail-text">
         {{ tagcloud_form.file.help_text }}
       </div>
-      <div class="step_option_input">
-        {{ tagcloud_form.file }}
-      </div>
-    </div>
-    <div class="clear"></div>
-    <div id="step_option">
-      <div class="step_option_image">
-        <img src="/media/images/process.png">
-      </div>
-      <div class="step_option_title">
+    </a>
+    <a href="#" class="ingest-selector" onclick="selectIngest(this, '#text-ingest'); return false;">
+      <img src="/media/images/process.png">
+      <h3>
         {{ tagcloud_form.body.label }}
-      </div>
-      <div class="step_option_help">
+      </h3>
+      <div class="detail-text">
         {{ tagcloud_form.body.help_text }}
       </div>
-      <div class="step_option_input">
-        {{ tagcloud_form.body }} 
-      </div>
-    </div>
+    </a>
   </div>
+  <form class="ingest" action="" method="post" enctype="multipart/form-data"> {% csrf_token %}
+    <div id="url-ingest" class="ingest-input-container">
+      {{ tagcloud_form.url }}
+    </div>
+    <div id="file-ingest" class="ingest-input-container" style="display:none;">
+      {{ tagcloud_form.file }}
+    </div>
+    <div id="text-ingest" class="ingest-input-container" style="display:none;">
+      {{ tagcloud_form.body }} 
+    </div>
+    
+
+    <button type="submit" class="ingest-submit"><h3>Create tag cloud!</h3></button>
+  </form>
+
+<!-- The following no longer belongs on this page. Left here for reference. -->
+
+<div style="display: none;">
   <div class="clear"></div>
   <div id="step">
    <div id="step_title">
@@ -145,25 +154,7 @@ function toggle_option(div_id) {
    <input type="submit" value="Create Tag Cloud">
    
   </div>
+</div>
 
 
-<form action="" method="post">
-{% csrf_token %}
-
-<input type="submit" value="Create Tag Cloud">
-</form>
-
-<script>
-function hide_initial() {
-    var url_input = document.getElementById("url_input");
-    var file_input = document.getElementById("file_input");
-    var text_input = document.getElementById("text_input");
-    url_input.style.display="none";
-    file_input.style.display="none";
-    text_input.style.display="none";
-}
-$(document).ready(hide_initial());
-
-
-</script>
 {% endblock %}
