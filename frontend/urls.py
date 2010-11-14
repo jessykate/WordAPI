@@ -10,7 +10,6 @@ urlpatterns = patterns('',
     url(r'^api', direct_to_template, {'template': 'frontend/api.html'}),
 
     url(r'^cloud/(?P<cloud_id>\w+)', cloud),
-    url(r'^document/save$', save),
     url(r'^topic/new$', new_topic),
     url(r'^document/new$', new_document),
     url(r'^collecion/new$', new_collection),
