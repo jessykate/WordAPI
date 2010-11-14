@@ -4,6 +4,10 @@
 {{ style|safe }}
 {% endblock %}
 
+{% block custom_include %}
+<link rel="stylesheet" media="screen" type="text/css" href="/media/colorpicker.css" />
+<script type="text/javascript" src="/media/js/colorpicker.js"></script>
+{% endblock %}
 {% block page_title %} - TagCloud{% endblock %}
 
 {% block custom_js %}
@@ -32,6 +36,21 @@ $(document).ready(function() {
         $("#save-box").dialog("open");
     });
 });
+
+$('#id_start_color, #id_end_color').ColorPicker({
+	onSubmit: function(hsb, hex, rgb, el) {
+		$(el).val(hex);
+		$(el).ColorPickerHide();
+	},
+	onBeforeShow: function () {
+		$(this).ColorPickerSetColor(this.value);
+	}
+})
+.bind('keyup', function(){
+	$(this).ColorPickerSetColor(this.value);
+});
+
+
 </script>
 {% endblock %}
 
@@ -50,8 +69,28 @@ update every time you visit it.</p>
 <input type="hidden" name="cloud_id" value="{{ cloud_id }}">
 </form>
 </div>
+
+<div id="tagcloud_controls">
+  <h4>Themes</h4>
+  <h4>Color</h4>
+  {{ tagcloud_form.start_color.label }}: <input type="text" maxlength="6" size="6" id="id_start_color" value="00ff00" />
+  {{ tagcloud_form.end_color.label }}: <input type="text" maxlength="6" size="6" id="id_end_color" value="0000ff" />
+  {{ tagcloud_form.color_steps.label }}: {{ tagcloud_form.color_steps }}
+      
+  <h4>{{ tagcloud_form.max_words.label }}: <input type="range"  min="0" max="{{ max_words_max }}" /></h3>
+  <h4 class="size-selector">Size:</h4>
+    <label><input class="radio" type="radio" name="size" value="240x180"> Small</label>
+    <label><input class="radio" type="radio" name="size" value="500x375"> Medium</label>
+    <label><input class="radio" type="radio" name="size" value="1024x768"> Large</label>
+  
+  <h4>Custom Stop Words</h4>
+</div>
+
 <div id="tagcloud_wrapper">
 {{ body|safe }}
+</div>
+
+<div class="clear">
 </div>
 
 <div id="infobox">

@@ -229,13 +229,41 @@ form.ingest {
     margin-left: 50px;
 }
 
+.tagcloud {
+    border: 2px;
+    border-color: #89b3be;
+    
+}
+
+#tagcloud_controls {
+    width: 150px;
+    background: #ffffff;
+    padding-top:30px;
+    padding-left: 20px;
+    float: left;
+    background: #89b3be;
+}
+
+#tagcloud_controls input {
+    width: 125px;
+}
+
+#tagcloud_controls input.radio {
+    width: auto;
+}
+
+.size-selector label {
+    display:block;
+}
 
 #tagcloud_wrapper {
+    width:750px;
     background: #ffffff;
     padding-top:30px;
     padding-bottom: 30px;
     padding-left: 20px;
     padding-right: 20px;
+    float:left;
 }
 
 #infobox {
