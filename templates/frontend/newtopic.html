@@ -1,6 +1,7 @@
 {% extends "frontend/base.html" %}
 
 {% block custom_js %}
+<script type="text/javascript">
 var num_sources = 0;
 function addSource(divID, source_type) {
     num_sources++;
@@ -23,6 +24,7 @@ function removeSource(divID) {
     formDiv.removeChild(lastChild);
     num_sources--;
 }
+</script>
 {% endblock %}
 
 {% block content %}

@@ -1,6 +1,6 @@
 body {
     font-family: 'Crimson Text', serif;
-    font-size: 120%;
+    font-size: 100%;
     width: 100%;
     margin: auto;
     color: #333333;
@@ -33,7 +33,7 @@ h2 {
 
 h3 {
     font-family: 'IM Fell Great Primer SC', serif;
-    font-size: 1.5em;
+    font-size: 1.9em;
     //font-weight: 400px;
     font-weight: normal;
     text-shadow: none;
@@ -43,6 +43,10 @@ h3 {
     word-spacing: 0em;
     line-height: 1em;
     margin-top: 0px;
+}
+
+.detail-text {
+    font-size: .8em;
 }
 
 .container {
@@ -181,54 +185,50 @@ h3 {
 
 
 /*  TagCloud input */
-
-#step {
-    height: 300px;
-    margin-top: 20px;
-    margin-bottom: 20px;
-    
+#ingest-selector-container {
+    overflow: hidden; /* "clears" floated children */
+    margin-bottom: 2em;
 }
 
-#step_title {
-    margin-bottom: 10px;
+.ingest-selector {
+  background: none;
+  border: none;
+  width: 200px;
+  margin-right: 50px;
+  float: left;
+  height: 150px;
 }
 
-#step_option {
-    width: 300px;
-    margin-left:15px;
-    margin-right:15px;
-    float:left;
-    
-}
-
-
-.step_option_image {
+.ingest-selector img {
     width: 75px;
     height: 75px;
     float: left;
-    
 }
 
-.step_option_title {
-    width: 225px;
-    float: left;
-    font-size: 28px;
-    
+.ingest-selector h3 {
+  margin-left: 95px;
+  margin-top: 20px;
 }
 
-.step_option_help {
-    width: 225px;
-    float: left;
-    height: 50px;
-    font-size: 12px;
-    
+.ingest-selector .detail-text {
+  clear: left;
+  margin-top: 1em;
 }
 
-.step_option_input {
-    width: 225px;
-    float: left;
-    
+form.ingest {
+    overflow: hidden; /* clears floats contained within */
 }
+
+.ingest-input-container {
+    width: 450px;
+    float:left;
+}
+
+.ingest-submit {
+    float: left;
+    margin-left: 50px;
+}
+
 
 #tagcloud_wrapper {
     background: #ffffff;
@@ -270,21 +270,22 @@ h3 {
     margin-right: 25px;
 }
 
-.overview_image {
-    width: 100px;
+.overview_block img {
+    margin-right: 30px;
     height: 70px;
+    width: 70px;
     float: left;
 }
 
-.overview_title {
+.overview_block h3 {
     width: 300px;
     float: left;
 }
-.overview_text {
+
+.overview_block .detail-text {
     width: 300px;
     float: left;
     height: 115px;
-    font-size: 12px;    
 }
 
 #sidebar {
@@ -357,6 +358,7 @@ a {
     color: #fad3a2;
 }
 
+a.selected,
 a:hover {
     color: #f6b058;
 }
