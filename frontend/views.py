@@ -7,6 +7,7 @@ from django.core.context_processors import csrf
 from frontend.forms import TagCloudForm, NewTopicForm
 import urllib, httplib2, datetime
 import pymongo
+import pymongo
 from pymongo.objectid import ObjectId
 from lib import bitly_shorten
 try:
@@ -73,32 +74,13 @@ def new_document(request):
                 js = json.loads(content)
                 body = js['body']
                 style = js['style']
+                metadata = js['metadata']
+                cloud_id = js['_id']
             except:
                 return HttpResponse('<b>API Error</b><br><br>'+content)
                 return
 
-            # replace the full body text with placeholder text, and then pass
-            # the API call url to the template so the user can see what was
-            # done. 
-            control_params = args
-            if 'body' in args:
-                control_params['body'] = "your text here"
-            generator_url = url + '?' + urllib.urlencode(control_params)
-
-            # tell the browser where it can insert a line break
-            generator_url_display = generator_url.replace('&', '<wbr>&')
-
-            print type(content)
-            # note that in the template, body and style need to be given the 'safe'
-            # filter so that the markup will be interpreted. otherwise it will be
-            # escaped and displayed as strings.
-            return render_to_formtemplate(request, 'frontend/tagcloud_display.html', {'body' : body,
-                                        'style' : style, 'generator_url' : generator_url,
-                                        'generator_url_display': generator_url_display, 
-                                        'tagcloud_json': content, 'tagcloud_form': form,
-                                        'max_words_max': 200}) #stubbed out values
-
-
+            return HttpResponseRedirect("/cloud/%s" % cloud_id)
         else:
             print request.POST
             print 'Form did not validate'
@@ -108,43 +90,21 @@ def new_document(request):
                                         'tagcloud_form' : form
                                         })
 
-def save(request):
-    if request.method == 'GET':
-        return HttpResponseRedirect("/")
-
-    # save data and url to db
-    data = request.POST.get('data')
-    record = json.loads(data)
-    record['created'] = datetime.datetime.now()
-    record['update_type'] = request.POST.get('update')
-    if request.POST.get('name', None):
-        record['cloud_name'] = request.POST.get('name')
-    # record['owner'] = username
-    # record['permissions'] = public
-    
-    # create the unique id for this record
-    oid = ObjectId()
-    uid = str(oid)
-    record['_id'] = oid
-    # create short link
-    long_url = settings.HOME_PAGE + '/cloud/' + uid
-    short_url = bitly_shorten(long_url)
-    print short_url
-    record['short_url'] = short_url
-    con = pymongo.Connection()
-    collection = con.wordapi.tagclouds
-    collection.insert(record)
-
-    # redirect to the cloud's page
-    return HttpResponseRedirect("/cloud/%s" % uid)
-
-    # a dynamic tagcloud saves the source information and rendering preferences
-
 def cloud(request, cloud_id):
     con = pymongo.Connection()
     collection = con.wordapi.tagclouds
     record = collection.find_one({'_id':ObjectId(cloud_id)})
-    return render_to_template(request, 'frontend/cloud.html', {'cloud':record})
+    # XXX TODO this needs to be its own form, not the tag cloud form. 
+    form = TagCloudForm()
+
+    #generator_url = url + '?' + urllib.urlencode(control_params)
+    # tell the browser where it can insert a line break
+    #generator_url_display = generator_url.replace('&', '<wbr>&')
+
+     # note that in the template, body and style need to be given the 'safe'
+    # filter so that the markup will be interpreted. otherwise it will be
+    # escaped and displayed as strings.
+    return render_to_template(request, 'frontend/cloud.html', {'cloud':record, 'update_form':form})
 
 def new_topic(request):
     #topic_form = NewTopicForm(request.POST)
@@ -182,3 +142,38 @@ def topic(request, topic_id):
 
 def new_collection(request):
     pass
+
+
+#def save(request):
+#    if request.method == 'GET':
+#        return HttpResponseRedirect("/")
+#
+#    # save data and url to db
+#    data = request.POST.get('data')
+#    record = json.loads(data)
+#    record['created'] = datetime.datetime.now()
+#    record['update_type'] = request.POST.get('update')
+#    if request.POST.get('name', None):
+#        record['cloud_name'] = request.POST.get('name')
+#    # record['owner'] = username
+#    # record['permissions'] = public
+#    
+#    # create the unique id for this record
+#    oid = ObjectId()
+#    uid = str(oid)
+#    record['_id'] = oid
+#    # create short link
+#    long_url = settings.HOME_PAGE + '/cloud/' + uid
+#    short_url = bitly_shorten(long_url)
+#    print short_url
+#    record['short_url'] = short_url
+#    con = pymongo.Connection()
+#    collection = con.wordapi.tagclouds
+#    collection.insert(record)
+#
+#    # redirect to the cloud's page
+#    return HttpResponseRedirect("/cloud/%s" % uid)
+#
+#    # a dynamic tagcloud saves the source information and rendering preferences
+
+

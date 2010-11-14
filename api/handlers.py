@@ -1,8 +1,11 @@
+from django.conf import settings
 from piston.handler import BaseHandler
 from piston.utils import rc
 import nltk, urllib, urllib2
-import random, math
-from lib import html_unescape
+import pymongo
+import random, math, datetime
+from lib import html_unescape, bitly_shorten
+
 try:
     import json
 except:
@@ -387,15 +390,27 @@ def tag_cloud(dist, id_ = "", class_ = "", width=None, height=None,
     style += '''
 </style>'''
 
-    # assemble the metadata
+   # assemble the response
+    oid = pymongo.objectid.ObjectId()
+    uid = str(oid)
+    long_url = settings.HOME_PAGE + '/cloud/' + uid
+    short_url = bitly_shorten(long_url)
     metadata = {
-        'utc_created': datetime.datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%S")
+        'utc_created': datetime.datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%S"),
         'total_tags' : words_in_cloud,        
+        'short_url' : short_url,
     }
+    record =  {'_id': oid, 
+                'body': body, 
+                'style': style, 
+                'metadata': metadata} 
 
-    # assemble and return the response
-    resp =  {'body': body, 'style': style, 'metadata': metadata}
-    return resp
+    # save to the database
+    con = pymongo.Connection()
+    collection = con.wordapi.tagclouds
+    collection.insert(record)
+    
+    return record
 
 class UrlTokenHandler(GeneralHandler):
     allowed_methods = ('GET',)
