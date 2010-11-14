@@ -405,6 +405,8 @@ def tag_cloud(dist, id_ = "", class_ = "", width=None, height=None,
                 'style': style, 
                 'metadata': metadata} 
 
+    print style
+
     # save to the database
     con = pymongo.Connection()
     collection = con.wordapi.tagclouds
