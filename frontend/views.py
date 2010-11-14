@@ -95,7 +95,8 @@ def new_document(request):
             return render_to_formtemplate(request, 'frontend/tagcloud_display.html', {'body' : body,
                                         'style' : style, 'generator_url' : generator_url,
                                         'generator_url_display': generator_url_display, 
-                                        'tagcloud_json': content})
+                                        'tagcloud_json': content, 'tagcloud_form': form,
+                                        'max_words_max': 200}) #stubbed out values
 
 
         else:

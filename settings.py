@@ -81,8 +81,8 @@ MIDDLEWARE_CLASSES = (
     # 'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
-    'piston.middleware.CommonMiddlewareCompatProxy',
-    'piston.middleware.ConditionalMiddlewareCompatProxy',
+    #'piston.middleware.CommonMiddlewareCompatProxy',
+    #'piston.middleware.ConditionalMiddlewareCompatProxy',
 )
 
 ROOT_URLCONF = 'wordapi.urls'
