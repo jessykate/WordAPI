@@ -63,6 +63,10 @@ def new_document(request):
             else: # this is a 'url' call
                 url = settings.API_URL + "/api/1.0/tagcloud/url.json"
 
+            # XXX this is a temporary hack until we get the ajax-y resize
+            # working. set the max_words and div size to something reasonable. 
+            args['max_words'] = 100
+            
             headers = {'Content-type': 'application/x-www-form-urlencoded',
                         'enctype': 'enctype="multipart/form-data"'}
             data = urllib.urlencode(args)
