@@ -1,5 +1,10 @@
 {% extends "frontend/base.html" %}
 
+{% block custom_include %}
+<link rel="stylesheet" media="screen" type="text/css" href="/media/colorpicker.css" />
+<script type="text/javascript" src="/media/js/colorpicker.js"></script>
+{% endblock %}
+
 {% block custom_js %}
 <script type="text/javascript">
 window.selectIngest = function(clickedSelector, ingestInputToShow){
@@ -19,6 +24,20 @@ window.selectIngest = function(clickedSelector, ingestInputToShow){
     jQuery(currIngestInput).toggle(shouldShow);
   });
 };
+
+$('#id_start_color, #id_end_color').ColorPicker({
+	onSubmit: function(hsb, hex, rgb, el) {
+		$(el).val(hex);
+		$(el).ColorPickerHide();
+	},
+	onBeforeShow: function () {
+		$(this).ColorPickerSetColor(this.value);
+	}
+})
+.bind('keyup', function(){
+	$(this).ColorPickerSetColor(this.value);
+});
+
 </script>
 {% endblock %}
 
@@ -68,7 +87,7 @@ window.selectIngest = function(clickedSelector, ingestInputToShow){
     <button type="submit" class="ingest-submit"><h3>Create tag cloud!</h3></button>
   </form>
 
-<!-- The following no longer belongs on this page. Left here for reference. -->
+<!-- The following no longer belongs on this page. Left here for reference.
 
 <div style="display: none;">
   <div class="clear"></div>
@@ -152,6 +171,6 @@ window.selectIngest = function(clickedSelector, ingestInputToShow){
    
   </div>
 </div>
-
+ -->
 
 {% endblock %}

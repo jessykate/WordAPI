@@ -43,6 +43,7 @@ $('#id_start_color, #id_end_color').ColorPicker({
 		$(el).ColorPickerHide();
 	},
 	onBeforeShow: function () {
+		alert("hello");
 		$(this).ColorPickerSetColor(this.value);
 	}
 })
