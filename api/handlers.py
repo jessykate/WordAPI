@@ -199,8 +199,8 @@ def quadratic_equation(a,b,c):
     a = float(a)
     b = float(b)
     c = float(c)
-    x1 = (-b + math.sqrt(pow(b,2.0) - 4.0*a*c))/2.0*a
-    x2 = (-b - math.sqrt(pow(b,2.0) - 4.0*a*c))/2.0*a
+    x1 = (-b + math.sqrt(pow(b,2.0) - 4.0*a*c))/(2.0*a)
+    x2 = (-b - math.sqrt(pow(b,2.0) - 4.0*a*c))/(2.0*a)
     return x1,x2
 
 def fit_to_area(width, height, dist, font):
@@ -213,18 +213,29 @@ def fit_to_area(width, height, dist, font):
     # actually takes up more or less pixels than its 'font size'. so we need to
     # figure out an effective width and height by converting to specific font
     # units. 
-    
+    # XXX TODO! 
 
-    # calculate the number of times a frequency occurs
+    # calculate the number of times a **frequency** occurs
     freqs = {}
     for word, freq in dist:
         freqs[freq] = freqs.get(freq, 0) + 1
 
-    # equation of the line: y = mx + b; m=1
+    # equation of the line: y = mx + b; m=1 so y = x + b
+    # where the input x = the frequency of the word, and the output y is the
+    # calculated font size. ie, font_size = freq + b. 
+    # so w * h = sum over each word (area of the word)
+    
+    # area of the word is its own width by height. here we assume for
+    # simplicity that the font is roughly square (ie a font size of 14px is
+    # 14px wide and 14px high). 
+
+    # ie w * h = (freq + b) = n*(freq+b), where n is the number of times a
+    # word with frequency freq appears. 
+    
     # to calculate area width * height in px^2:
     # width * height = sum over i: n_i*(f_i + b)^2
     # where we want to solve for b, the intercept of the line.
-    # each i'th term implifies to:
+    # each i'th term simplifies to:
     # nf^2 + 2nfb + nb^2
     # we compute the sum and collect like terms, ending with 
     # a polynomial of the form:
@@ -233,17 +244,26 @@ def fit_to_area(width, height, dist, font):
     # and then use the quadratic equation to solve for b. 
     a1 = -(w*h)
     a2 = a3 = 0
+    m = 1
+    print 'calculating coefficients'
     for f, n in freqs.iteritems():
-        a1 += n*pow(f,2.0)
-        a2 += 2*n*f
+        print f,n
+        a1 += n*pow(m,2.0)*pow(f,2.0)
+        a2 += 2*n*m*f
         a3 += n
 
+    print 'a1 = %f, a2 = %f, a3 = %f' % (a1,a2,a3)
     # solve for b using quadratic formula
     b1,b2 = quadratic_equation(a1,a2,a3)
 
+    print 'quadratic results'
+    print 'b1 = %f, b2 = %f' % (b1, b2)
     if b1>b2: 
-        b = b1
+        b = b2
     else: b = b2
+
+    print 'font size determination'
+    print "b = %f" % b
 
     font_size_fn = lambda freq: freq+b
     return font_size_fn
@@ -270,6 +290,7 @@ def min_max_extrapolate(dist, max_size, min_size):
         b = max_size - m*max_freq
         font_size_fn = lambda freq: m*freq+b
 
+    print 'for the set font size, m was calculated to be %f and b calculated to be %f' % (m, b)
     return font_size_fn
 
 def tag_cloud(dist, id_ = "", class_ = "", width=None, height=None, 
@@ -280,7 +301,7 @@ def tag_cloud(dist, id_ = "", class_ = "", width=None, height=None,
     defalt styling for the tag cloud, while body contains the html
     markup. '''
 
-    # sort() returns a list of tuples in order of decreasing frequency 
+    # sort() returns a list of (word, count) tuples in order of decreasing frequency 
     dist = sort(dist) 
     
     # truncate the list of items if max_words was specified
@@ -288,9 +309,13 @@ def tag_cloud(dist, id_ = "", class_ = "", width=None, height=None,
         max_words = int(max_words)
         dist = dist[:max_words]            
 
+    # get the number of words remaining in dist (ie the number of tags in the
+    # tagcloud) to pass back in the metadata 
+    words_in_cloud = len(dist)
+
     # get the equation of the line
-    max_size = 70;
-    min_size = 10;
+    #max_size = 70;
+    #min_size = 10;
     if max_size and min_size:
         font_size_fn = min_max_extrapolate(dist, max_size, min_size)
     else:
@@ -299,7 +324,6 @@ def tag_cloud(dist, id_ = "", class_ = "", width=None, height=None,
             height = 800
         font = 'times new roman'
         font_size_fn = fit_to_area(width, height, dist, font)
-        print font_size_fn
 
     # get the equation of the line between min_size and max_size. do this AFTER
     # truncating to max_words and BEFORE shuffling the order around.  
@@ -362,9 +386,15 @@ def tag_cloud(dist, id_ = "", class_ = "", width=None, height=None,
 % (freq_as_word, font_size_fn(f), color))
     style += '''
 </style>'''
-    print 'style portion'
-    print style
-    resp =  {'body': body, 'style': style}
+
+    # assemble the metadata
+    metadata = {
+        'utc_created': datetime.datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%S")
+        'total_tags' : words_in_cloud,        
+    }
+
+    # assemble and return the response
+    resp =  {'body': body, 'style': style, 'metadata': metadata}
     return resp
 
 class UrlTokenHandler(GeneralHandler):
