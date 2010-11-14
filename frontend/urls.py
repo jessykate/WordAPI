@@ -7,7 +7,8 @@ urlpatterns = patterns('',
     url(r'^create', direct_to_template, {'template': 'frontend/create.html'}),
     url(r'^examples', direct_to_template, {'template': 'frontend/examples.html'}),
     url(r'^browse', direct_to_template, {'template': 'frontend/browse.html'}),
-    url(r'^api', direct_to_template, {'template': 'frontend/api.html'}),
+    # need the trailing $ after api since the api calls start with /api too
+    url(r'^api$', direct_to_template, {'template': 'frontend/api.html'}),
 
     url(r'^cloud/(?P<cloud_id>\w+)', cloud),
     url(r'^topic/new$', new_topic),

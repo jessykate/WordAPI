@@ -5,7 +5,7 @@ from django.template import RequestContext
 from django.http import HttpResponseRedirect, HttpResponse
 from django.core.context_processors import csrf
 from frontend.forms import TagCloudForm, NewTopicForm
-import urllib, httplib2, datetime
+import urllib, httplib2, datetime, re
 import pymongo
 import pymongo
 from pymongo.objectid import ObjectId
@@ -95,9 +95,21 @@ def new_document(request):
                                         })
 
 def cloud(request, cloud_id):
-    con = pymongo.Connection()
-    collection = con.wordapi.tagclouds
-    record = collection.find_one({'_id':ObjectId(cloud_id)})
+
+    print cloud_id
+    if re.search('[^0-9a-zA-Z]', cloud_id):
+        return HttpResponse('Invalid Cloud ID')
+
+    url = settings.API_URL + '/api/1.0/cloud/' + cloud_id + '.json'
+    print 'retrieving cloud...'
+    print url
+    http = httplib2.Http()
+    response, content = http.request(url, 'GET')
+    try:
+        record = json.loads(content)
+    except:
+        return HttpResponse('<b>API Error</b><br><br>'+content)
+
     # XXX TODO this needs to be its own form, not the tag cloud form. 
     form = TagCloudForm()
 

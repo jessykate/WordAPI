@@ -2,7 +2,7 @@ from django.conf import settings
 from piston.handler import BaseHandler
 from piston.utils import rc
 import nltk, urllib, urllib2
-import pymongo
+import pymongo, pymongo.json_util
 import random, math, datetime
 from lib import html_unescape, bitly_shorten
 
@@ -447,6 +447,25 @@ class RequestFrequencyHandler(GeneralHandler):
     def execute(self):
         tokens =  tokenize(self.fargs[0], **self.kwargs )
         return nltk.FreqDist(tokens)
+
+
+class CloudRetreiveHandler(BaseHandler):
+    allowed_methods = ('GET')
+
+    def read(self, request, cloud_id):
+        if not cloud_id:
+            resp = rc.BAD_REQUEST
+            resp.write(': Missing Required Parameter "cloud_id"')
+            return resp
+
+        print 'retrieved cloud'
+        con = pymongo.Connection()
+        collection = con.wordapi.tagclouds
+        record = collection.find_one({'_id':pymongo.objectid.ObjectId(cloud_id)})
+        print record['_id']        
+        # pymongo.json_util will properly encode the json-like mongo object
+        #return json.dumps(record, default=pymongo.json_util.default)
+        return record
 
 class TagCloudBaseHandler(GeneralHandler):
     ''' assumes body will be a blob of text, not a url. still has option to

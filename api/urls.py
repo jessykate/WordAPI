@@ -2,7 +2,8 @@ from wordapi.api.handlers import (
     UrlTokenHandler, RequestTokenHandler, 
     UrlFrequencyHandler, RequestFrequencyHandler,
     TagCloudBodyHandler, TagCloudUrlHandler,
-    TagCloudFreqHandler,TagCloudFileHandler
+    TagCloudFreqHandler,TagCloudFileHandler,
+    CloudRetreiveHandler,
     )
 
 from django.conf.urls.defaults import patterns, url
@@ -23,6 +24,8 @@ urlpatterns = patterns('',
   url(r'^tagcloud/url\.(?P<emitter_format>.+)$', Resource(TagCloudUrlHandler)),
   # build a tag cloud from the json-encoded dictionary of frequencies passed in 
   url(r'^tagcloud/freq\.(?P<emitter_format>.+)$', Resource(TagCloudFreqHandler)),
+  # retreive a tag cloud
+  url(r'^cloud/(?P<cloud_id>[0-9A-Za-z]+)\.(?P<emitter_format>.+)$', Resource(CloudRetreiveHandler)),
   # build a tag cloud from the file uploaded
   url(r'^tagcloud/file\.(?P<emitter_format>.+)$', Resource(TagCloudFileHandler)),
 
