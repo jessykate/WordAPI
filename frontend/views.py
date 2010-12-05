@@ -9,7 +9,6 @@ import urllib, httplib2, datetime, re
 import pymongo
 import pymongo
 from pymongo.objectid import ObjectId
-from lib import bitly_shorten
 try:
     import json
 except:
@@ -72,7 +71,7 @@ def new_document(request):
             data = urllib.urlencode(args)
             http = httplib2.Http()
             print 'about to make api call to %s' % url
-            print url + '?' + data
+            #print url + '?' + data
             response, content = http.request(url, 'POST', headers=headers, body=data)
             try:
                 js = json.loads(content)
