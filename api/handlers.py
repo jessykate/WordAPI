@@ -208,21 +208,21 @@ def quadratic_equation(a,b,c):
 
 def fit_to_area(width, height, dist, font):
 
-    # add a 10% buffer to the area we fill:
-    w = 0.9*width
-    h = 0.9*height
-
-    # there is the mild problem that a given font's true size in pixels often
-    # actually takes up more or less pixels than its 'font size'. so we need to
-    # figure out an effective width and height by converting to specific font
-    # units. 
-    # XXX TODO! 
+    w = width
+    h = height
 
     # calculate the number of times a **frequency** occurs
     freqs = {}
     for word, freq in dist:
         freqs[freq] = freqs.get(freq, 0) + 1
 
+	# decide the intercept such that the smallest frequency we are visualizing
+	# has a 'reasonable' font size-- say, 14px. 
+    min_freq = min([d[1] for d in dist])
+    min_font = 14
+	b = lambda m: min_font - m*min_freq
+
+    
     # equation of the line: y = mx + b; m=1 so y = x + b
     # where the input x = the frequency of the word, and the output y is the
     # calculated font size. ie, font_size = freq + b. 
@@ -230,9 +230,9 @@ def fit_to_area(width, height, dist, font):
     
     # area of the word is its own width by height. here we assume for
     # simplicity that the font is roughly square (ie a font size of 14px is
-    # 14px wide and 14px high). 
+    # 14px wide times the number of letters in the word, and 14px high). 
 
-    # ie w * h = (freq + b) = n*(freq+b), where n is the number of times a
+    # so, w * h = (freq + b) = n*(freq+b), where n is the number of times a
     # word with frequency freq appears. 
     
     # to calculate area width * height in px^2:
@@ -251,6 +251,7 @@ def fit_to_area(width, height, dist, font):
     print 'calculating coefficients'
     for f, n in freqs.iteritems():
         print f,n
+        #a1 += n*pow(f,2.0)
         a1 += n*pow(m,2.0)*pow(f,2.0)
         a2 += 2*n*m*f
         a3 += n
@@ -261,9 +262,12 @@ def fit_to_area(width, height, dist, font):
 
     print 'quadratic results'
     print 'b1 = %f, b2 = %f' % (b1, b2)
-    if b1>b2: 
+	# not sure if we want the smaller or bigger solution, but the bigger one
+	# will be a translation of the line to the right, resulting in larger fonts
+	# for a given frequency. 
+    if b1<b2: 
         b = b2
-    else: b = b2
+    else: b = b1
 
     print 'font size determination'
     print "b = %f" % b
@@ -323,8 +327,8 @@ def tag_cloud(dist, id_ = "", class_ = "", width=None, height=None,
         font_size_fn = min_max_extrapolate(dist, max_size, min_size)
     else:
         if not (width and height):
-            width = 600
-            height = 800
+            width = 40
+            height = 50
         font = 'times new roman'
         font_size_fn = fit_to_area(width, height, dist, font)
 
@@ -333,13 +337,17 @@ def tag_cloud(dist, id_ = "", class_ = "", width=None, height=None,
 
     # determine the sort order. if the sort order is frequency, there's nothing
     # to do since the distribution object is already sorted by frequency. 
-    if sort_order not in ['random', 'frequency', 'alphabetical']:
-        print 'invalid sort order; using default = random'
-        sort_order = 'random'
+	if not sort_order in ['random', 'frequency', 'alphabetical']:
+	    print 'invalid sort order; using default = random'
+	    sort_order = 'random'
 
-    if sort_order == 'random':
-        # shuffles in place
-        random.shuffle(dist)
+	print "printing dist ..."
+	print dist
+    if sort_order == 'random': 
+		# shuffles in place
+		print "about to call shuffle"
+		random.shuffle(dist)
+		print "called shuffle"
 
     if sort_order == 'alphabetical':
         # not yet implemented 
@@ -361,9 +369,8 @@ def tag_cloud(dist, id_ = "", class_ = "", width=None, height=None,
         # the user may specify additional styling. **note**: make sure the
         # space after the span is maintained; otherwise the spans within the
         # div won't wrap. 
-        body += '''<span title="%d" class="word %s">%s</span> ''' % (freq, num_to_word(freq), word)
+        body += '''<div title="%d" class="word %s">%s</div> ''' % (freq, num_to_word(freq), word)
     body += '''</div>'''
-    #print body
 
     if start_color and end_color and color_steps:
         num_colors = int(color_steps)
@@ -378,14 +385,14 @@ def tag_cloud(dist, id_ = "", class_ = "", width=None, height=None,
     for f in [x[1] for x in dist]: 
         if f not in freqs: freqs.append(f)
     style = '''<style type="text/css">
-.tagcloud {width: %s; height: %s; text-align: center; }
-.word { text-align: center; vertical-align: middle; } ''' % (width, height)
+.tagcloud {width: %dem; height: %dem; text-align: center; }
+.word { text-align: center; vertical-align: middle; line-height:1; padding-right:5px; float:left; } ''' % (width, height)
     for f in freqs:
         freq_as_word = num_to_word(f)
         color_index = f % num_colors
         color = colors[color_index]
     	style += ('''
-.%s {padding-left: 15px; padding-right: 15px; font-size: %s; color: %s }''' 
+.%s {font-size: %sem; color: %s }''' 
 % (freq_as_word, font_size_fn(f), color))
     style += '''
 </style>'''
@@ -394,7 +401,10 @@ def tag_cloud(dist, id_ = "", class_ = "", width=None, height=None,
     oid = pymongo.objectid.ObjectId()
     uid = str(oid)
     long_url = settings.HOME_PAGE + '/cloud/' + uid
-    short_url = bitly_shorten(long_url)
+    if settings.DEBUG:
+        short_url = long_url
+    else:
+        short_url = bitly_shorten(long_url)
     metadata = {
         'utc_created': datetime.datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%S"),
         'total_tags' : words_in_cloud,        
@@ -540,6 +550,7 @@ class TagCloudBaseHandler(GeneralHandler):
 
 class TagCloudBodyHandler(TagCloudBaseHandler):
     # 'body' becomes fargs[0] in the parent class's execute() method
+    print 'in body handler'
     args_required = ['body']
 
     def get_text(self):

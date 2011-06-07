@@ -59,6 +59,7 @@ def new_document(request):
 
             elif 'freqs' in args:
                 url = settings.API_URL + "/api/1.0/tagcloud/freq.json"
+
             else: # this is a 'url' call
                 url = settings.API_URL + "/api/1.0/tagcloud/url.json"
 
@@ -66,13 +67,14 @@ def new_document(request):
             # working. set the max_words and div size to something reasonable. 
             args['max_words'] = 100
             
+            print 'data arguments'
             headers = {'Content-type': 'application/x-www-form-urlencoded',
                         'enctype': 'enctype="multipart/form-data"'}
-            data = urllib.urlencode(args)
+            args = urllib.urlencode(args)
+            print args
             http = httplib2.Http()
             print 'about to make api call to %s' % url
-            #print url + '?' + data
-            response, content = http.request(url, 'POST', headers=headers, body=data)
+            response, content = http.request(url, 'POST', headers=headers, body=args)
             try:
                 js = json.loads(content)
                 body = js['body']
