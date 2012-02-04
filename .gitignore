@@ -1,4 +1,6 @@
 *.pyc
 *swp
+*swo
+*swn
 *~
 local_settings.py
