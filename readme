@@ -1,5 +1,14 @@
 A web service for document and topic analysis offering both an API and a frontend. 
 
+dependencies:
+
+
+to run:
+create local_settings.py
+choose port to run API and front end
+start mongodb 
+
+
 
 
 
