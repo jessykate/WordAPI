@@ -1,6 +1,5 @@
 body {
     font-family: 'Crimson Text', serif;
-    font-size: 100%;
     width: 100%;
     margin: auto;
     color: #333333;
@@ -397,3 +396,4 @@ a.block-link {
 .create:hover {
     background: #eeeeee; //fad3a2;
 }
+

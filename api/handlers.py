@@ -2,7 +2,7 @@ from django.conf import settings
 from piston.handler import BaseHandler
 from piston.utils import rc
 import nltk, urllib, urllib2
-import pymongo, pymongo.json_util
+import pymongo, pymongo.json_util, pymongo.objectid
 import random, math, datetime
 from lib import html_unescape, bitly_shorten
 
@@ -24,7 +24,7 @@ class GeneralHandler(BaseHandler):
     args_optional = None
 
     def execute():
-        ''' Override this is your child class.'''
+        ''' Override this in your child class.'''
         pass
 
     def read(self, request):
@@ -207,6 +207,9 @@ def quadratic_equation(a,b,c):
     return x1,x2
 
 def fit_to_area(width, height, dist, font):
+	pass
+
+def fit_to_area_old(width, height, dist, font):
 
     w = width
     h = height
@@ -216,12 +219,12 @@ def fit_to_area(width, height, dist, font):
     for word, freq in dist:
         freqs[freq] = freqs.get(freq, 0) + 1
 
+    # XX NOT SURE WHY THESE 3 LINES ARE HERE
 	# decide the intercept such that the smallest frequency we are visualizing
 	# has a 'reasonable' font size-- say, 14px. 
-    min_freq = min([d[1] for d in dist])
-    min_font = 14
-	b = lambda m: min_font - m*min_freq
-
+    #min_freq = min([d[1] for d in dist])
+    #min_font = 14
+    #b = min_font-m*min_freq
     
     # equation of the line: y = mx + b; m=1 so y = x + b
     # where the input x = the frequency of the word, and the output y is the
@@ -301,128 +304,137 @@ def min_max_extrapolate(dist, max_size, min_size):
     return font_size_fn
 
 def tag_cloud(dist, id_ = "", class_ = "", width=None, height=None, 
-              max_size=None, min_size=None, max_words = None, 
-              start_color=None, end_color=None, color_steps=None, 
-              sort_order="random"):
-    ''' returns a dict with style and body elements. style contains
-    defalt styling for the tag cloud, while body contains the html
-    markup. '''
+		max_size=None, min_size=None, max_words = None, 
+		start_color=None, end_color=None, color_steps=None, 
+		sort_order="random"):
+	''' returns a dict with style and body elements. style contains
+	defalt styling for the tag cloud, while body contains the html
+	markup. '''
 
-    # sort() returns a list of (word, count) tuples in order of decreasing frequency 
-    dist = sort(dist) 
-    
-    # truncate the list of items if max_words was specified
-    if max_words:
-        max_words = int(max_words)
-        dist = dist[:max_words]            
+	# sort() returns a list of (word, count) tuples in order of decreasing frequency 
+	dist = sort(dist) 
 
-    # get the number of words remaining in dist (ie the number of tags in the
-    # tagcloud) to pass back in the metadata 
-    words_in_cloud = len(dist)
+	# truncate the list of items if max_words was specified
+	if max_words:
+		max_words = int(max_words)
+		dist = dist[:max_words]            
 
-    # get the equation of the line
-    #max_size = 70;
-    #min_size = 10;
-    if max_size and min_size:
-        font_size_fn = min_max_extrapolate(dist, max_size, min_size)
-    else:
-        if not (width and height):
-            width = 40
-            height = 50
-        font = 'times new roman'
-        font_size_fn = fit_to_area(width, height, dist, font)
+	# get the number of words remaining in dist (ie the number of tags in the
+	# tagcloud) to pass back in the metadata 
+	words_in_cloud = len(dist)
 
-    # get the equation of the line between min_size and max_size. do this AFTER
-    # truncating to max_words and BEFORE shuffling the order around.  
+	# get the equation of the line for a baseline max and min size. actual
+	# fonts will be resized by javascript. 
+	max_size = 70;
+	min_size = 10;
+	font_size_fn = min_max_extrapolate(dist, max_size, min_size)
+	if not (width and height):
+		print "setting default width and height" 
+		width = 600
+		height = 400
 
-    # determine the sort order. if the sort order is frequency, there's nothing
-    # to do since the distribution object is already sorted by frequency. 
+	# get the equation of the line between min_size and max_size. do this AFTER
+	# truncating to max_words and BEFORE shuffling the order around.  
+
+	# determine the sort order. if the sort order is frequency, there's nothing
+	# to do since the distribution object is already sorted by frequency. 
 	if not sort_order in ['random', 'frequency', 'alphabetical']:
-	    print 'invalid sort order; using default = random'
-	    sort_order = 'random'
+		print 'invalid sort order; using default = random'
+		sort_order = 'random'
 
 	print "printing dist ..."
 	print dist
-    if sort_order == 'random': 
+	if sort_order == 'random': 
 		# shuffles in place
 		print "about to call shuffle"
 		random.shuffle(dist)
 		print "called shuffle"
 
-    if sort_order == 'alphabetical':
-        # not yet implemented 
-        pass
-    
-    # assemble the class and id tags for the tag cloud's wrapping div 
-    divstyle = '''class="tagcloud"'''
-    if class_ != "": 
-        divstyle = divstyle[:-1] + " " + class_ + ''' "'''
-    
-    # the user can specify a unique id for the tag cloud if they want
-    # additional styling applied from their own style sheets. 
-    if id_ != "": divstyle += ''' id="%s" ''' % id_
-    divstyle = divstyle.strip()	  
+	if sort_order == 'alphabetical':
+		# not yet implemented 
+		pass
 
-    body = '''<div %s>''' % divstyle
-    for word, freq in dist:
-        # each word has a class of 'word' in addition to its frequency so that
-        # the user may specify additional styling. **note**: make sure the
-        # space after the span is maintained; otherwise the spans within the
-        # div won't wrap. 
-        body += '''<div title="%d" class="word %s">%s</div> ''' % (freq, num_to_word(freq), word)
-    body += '''</div>'''
+	# assemble the class and id tags for the tag cloud's wrapping div 
+	divstyle = '''id="tagcloud"'''
+	if class_ != "": 
+		divstyle = divstyle[:-1] + " " + class_ + ''' "'''
 
-    if start_color and end_color and color_steps:
-        num_colors = int(color_steps)
-        colors = color_scheme(start_color, end_color, color_steps)
-    else:
-        num_colors = 5
-        colors = color_scheme()
+	# the user can specify a unique id for the tag cloud if they want
+	# additional styling applied from their own style sheets. 
+	if id_ != "": divstyle += ''' id="%s" ''' % id_
+	divstyle = divstyle.strip()	  
 
-    # get the distinct frequencies and specify a font-size and color for each,
-    # that corresponds to its size 
-    freqs = []
-    for f in [x[1] for x in dist]: 
-        if f not in freqs: freqs.append(f)
-    style = '''<style type="text/css">
-.tagcloud {width: %dem; height: %dem; text-align: center; }
-.word { text-align: center; vertical-align: middle; line-height:1; padding-right:5px; float:left; } ''' % (width, height)
-    for f in freqs:
-        freq_as_word = num_to_word(f)
-        color_index = f % num_colors
-        color = colors[color_index]
-    	style += ('''
+	body = '''<div %s>''' % divstyle
+	for word, freq in dist:
+		# each word has a class of 'word' in addition to its frequency so that
+		# the user may specify additional styling. **note**: make sure the
+		# space after the span is maintained; otherwise the spans within the
+		# div won't wrap. 
+		body += '''<div title="%d" class="word %s">%s</div> ''' % (freq, num_to_word(freq), word)
+	body += '''</div>'''
+
+	if start_color and end_color and color_steps:
+		num_colors = int(color_steps)
+		colors = color_scheme(start_color, end_color, color_steps)
+	else:
+		num_colors = 5
+		colors = color_scheme()
+
+	# get the distinct frequencies and specify a font-size and color for each,
+	# that corresponds to its size 
+	freqs = []
+	for f in [x[1] for x in dist]: 
+		if f not in freqs: freqs.append(f)
+	style = '''<style type="text/css">
+// important clearfix for divs which wrap floating elements
+// see http://nicolasgallagher.com/micro-clearfix-hack/
+#hidden-resizer { zoom: 1; }
+#hidden-resizer:before, #hidden-resizer:after { content: ""; display: table; }
+#hidden-resizer:after { clear: both; }
+#tagcloud { font-size: 10px; text-align: center; zoom: 1; }
+#tagcloud:before, #tagcloud:after { content: ""; display: table; }
+#tagcloud:after { clear: both; }
+.word { text-align: center; vertical-align: middle; line-height:1; padding-right:5px; float:left; } '''
+	for f in freqs:
+		freq_as_word = num_to_word(f)
+		color_index = f % num_colors
+		color = colors[color_index]
+		style += ('''
 .%s {font-size: %sem; color: %s }''' 
 % (freq_as_word, font_size_fn(f), color))
-    style += '''
+	style += '''
 </style>'''
 
-   # assemble the response
-    oid = pymongo.objectid.ObjectId()
-    uid = str(oid)
-    long_url = settings.HOME_PAGE + '/cloud/' + uid
-    if settings.DEBUG:
-        short_url = long_url
-    else:
-        short_url = bitly_shorten(long_url)
-    metadata = {
-        'utc_created': datetime.datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%S"),
-        'total_tags' : words_in_cloud,        
-        'short_url' : short_url,
-    }
-    record =  {'_id': oid, 
-                'body': body, 
-                'style': style, 
-                'metadata': metadata} 
+   # assemble the response (if you get an error on this line, probably mongo is
+   # not running)
+	oid = pymongo.objectid.ObjectId()
+	uid = str(oid)
+	long_url = settings.HOME_PAGE + '/cloud/' + uid
+	if settings.DEBUG:
+		short_url = long_url
+	else:
+		short_url = bitly_shorten(long_url)
+	metadata = {
+			'utc_created': datetime.datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%S"),
+			'total_tags' : words_in_cloud,        
+			'short_url' : short_url,
+			}
+	record =  {'_id': oid, 
+			'body': body, 
+			'style': style, 
+			# not all tagclouds will necessarily have width and height?
+			'width': width,
+			'height': height,
+			'metadata': metadata} 
 
-    print style
+	print style
 
-    # save to the database
-    con = pymongo.Connection()
-    collection = con.wordapi.tagclouds
-    collection.insert(record)
-    
-    return record
+	# save to the database
+	con = pymongo.Connection()
+	collection = con.wordapi.tagclouds
+	collection.insert(record)
+
+	return record
 
 class UrlTokenHandler(GeneralHandler):
     allowed_methods = ('GET',)
@@ -460,22 +472,23 @@ class RequestFrequencyHandler(GeneralHandler):
 
 
 class CloudRetreiveHandler(BaseHandler):
-    allowed_methods = ('GET')
-
-    def read(self, request, cloud_id):
-        if not cloud_id:
-            resp = rc.BAD_REQUEST
-            resp.write(': Missing Required Parameter "cloud_id"')
-            return resp
-
-        print 'retrieved cloud'
-        con = pymongo.Connection()
-        collection = con.wordapi.tagclouds
-        record = collection.find_one({'_id':pymongo.objectid.ObjectId(cloud_id)})
-        print record['_id']        
-        # pymongo.json_util will properly encode the json-like mongo object
-        #return json.dumps(record, default=pymongo.json_util.default)
-        return record
+	''' retrieve an existing tag cloud'''
+	allowed_methods = ('GET')
+	
+	def read(self, request, cloud_id):
+		if not cloud_id:
+			resp = rc.BAD_REQUEST
+			resp.write(': Missing Required Parameter "cloud_id"')
+			return resp
+		
+		print 'retrieved cloud'
+		con = pymongo.Connection()
+		collection = con.wordapi.tagclouds
+		record = collection.find_one({'_id':pymongo.objectid.ObjectId(cloud_id)})
+		print record['_id']        
+		# pymongo.json_util will properly encode the json-like mongo object
+		# return json.dumps(record, default=pymongo.json_util.default)
+		return record
 
 class TagCloudBaseHandler(GeneralHandler):
     ''' assumes body will be a blob of text, not a url. still has option to
