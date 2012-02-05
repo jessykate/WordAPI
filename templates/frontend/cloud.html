@@ -1,100 +1,10 @@
 {% extends "frontend/base.html" %}
 
-{% block custom_style %}
-{{ cloud.style|safe }}
-{% endblock %}
-
 {% block custom_include %}
 <link rel="stylesheet" media="screen" type="text/css" href="/media/colorpicker.css" />
 <script type="text/javascript" src="/media/js/colorpicker.js"></script>
 {% endblock %}
 {% block page_title %} - TagCloud{% endblock %}
-
-{% block custom_js %}
-<script type="text/javascript">
-$(document).ready(function() {
-
-		$('<div />', {id: 'hidden-resizer'}).appendTo(document.body);
-		//$('<div />', {id: 'hidden-resizer'}).hide().appendTo(document.body);
-		var resizer = $("#hidden-resizer");
-		resizer.html( '{{ cloud.body|safe }} <div class="clearboth"></div>' );
-		var tgcl = $("#tagcloud");
-		// need to specify one of the dimensions
-		tgcl.width( {{cloud.width}} );
-
-		// log the desired cloud dimensions (this is the target)
-		console.log("desired cloud dimensions");
-		console.log( {{cloud.width}} );
-		console.log( {{cloud.height}} );
-		
-		// set font size explicitly so we can modify it
-		tgcl.css("font-size", "10px");
-
-		alert("resizing...");
-		var count = 0;
-		while ( tgcl.height() > {{ cloud.height }} ) {
-			var sz = parseInt(tgcl.css("font-size"));
-			console.log(sz);
-			tgcl.css("font-size", sz - 1);
-			console.log("tagcloud info now:");
-			console.log(tgcl.width());
-			console.log(tgcl.height());
-			console.log(tgcl.css("font-size"));
-		} 
-		/* inject the resized tagcloud back into the page where it belongs.
-		   remove the hidden resizer element since it is no longer needed and
-		   #tagcloud is an id and should be unique on the page. */
-		var tgcl_html = resizer.html();
-		resizer.remove();
-		$("#tagcloud_wrapper").html(tgcl_html);
-
-		console.log("tagcloud dimensions are now:");
-		console.log($("#tagcloud").width());
-		console.log($("#tagcloud").height());
-
-		/*
-    $("#save-box").dialog({
-        autoOpen: false,
-        width: 350,
-        model: true,
-        buttons : {
-            'Create!' : function() { 
-                // check validity of arguments
-                // submit the form
-                $('#save-form').submit();
-            },
-            'Cancel' : function() {
-                $(this).dialog("close");
-            }
-        }, 
-        close: function() {
-            allFields.val('');
-        }
-    });
-    $("#save-cloud").button().click(function() {
-        $("#save-box").dialog("open");
-		});
-		 */
-
-});
-
-$('#id_start_color, #id_end_color').ColorPicker({
-	onSubmit: function(hsb, hex, rgb, el) {
-		$(el).val(hex);
-		$(el).ColorPickerHide();
-	},
-	onBeforeShow: function () {
-		$(this).ColorPickerSetColor(this.value);
-	}
-})
-.bind('keyup', function(){
-	$(this).ColorPickerSetColor(this.value);
-});
-
-
-
-</script>
-{% endblock %}
 
 {% block content %}
 <div id="save-box">
@@ -129,6 +39,10 @@ update every time you visit it.</p>
 </div>
 
 <div id="tagcloud_wrapper">
+	{{ cloud.style|safe }}
+	{{ cloud.body|safe}}
+	{{ cloud.wordcloud_size|safe}}
+	{{ cloud.script|safe}}
 </div>
 
 <div class="clear">

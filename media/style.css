@@ -7,7 +7,7 @@ body {
 
 h1 {
     font-family: 'Josefin Sans Std Light', serif;
-    font-size: 70px;
+    font-size: 60px;
     font-weight: 300;
     text-shadow: none;
     text-decoration: none;
@@ -45,7 +45,8 @@ h3 {
 }
 
 .detail-text {
-    font-size: .8em;
+    font-size: 1em;
+	padding-left: 100px;
 }
 
 .container {
