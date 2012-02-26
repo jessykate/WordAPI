@@ -89,12 +89,14 @@ def get_url(url):
     return fp.read()
     
 
-def tokenize(body, tokenizer=None, strip='true', normalize=True, remove_stopwords = True):    
+def tokenize(body, tokenizer=None, strip='true', normalize=True, 
+		remove_stopwords = True, custom_stopwords = ''):    
+
     if strip.lower() != 'false':
         body = nltk.clean_html(body)        
         
-    # if tokenizer is None, use a basic tokenizer that takes sequences of
-    # alphanumeric characters and includes hyphenated terms.
+	# if tokenizer is None, use a basic tokenizer that takes sequences of
+	# alphanumeric characters and includes hyphenated terms.
     if not tokenizer:
         tokenizer = r'[\w\-]+'
     else:
@@ -110,14 +112,22 @@ def tokenize(body, tokenizer=None, strip='true', normalize=True, remove_stopword
         return resp
     #body = body.encode('utf-8')
     tokens = tknizr.tokenize(body)
+
+	# normalize case
     if normalize:
         tokens = [token.lower() for token in tokens] 
     if remove_stopwords:
         stopwords = nltk.corpus.stopwords.words('english')
-        stopwords.extend(['1','2','3','4','5','6','7','8','9','0']) 
-        # call lower() on each token because we can't be sure the tokens are
-        # normalized. 
+        stopwords.extend(['1','2','3','4','5','6','7','8','9','0', '-',"'",'"','(',')']) 
+		# call lower() on each token because we can't be sure the tokens are
+		# normalized. 
         tokens = [token for token in tokens if token.lower() not in stopwords]
+	print 'custom_stopwords'
+	print custom_stopwords
+	if custom_stopwords != '':
+		custom = custom_stopwords.split(',')
+		custom = [c.strip().lower() for c in custom]
+		tokens = [token for token in tokens if token.lower() not in custom]
     return tokens
 
 def _tup_cmp(t1, t2):
@@ -304,34 +314,11 @@ def extrapolate_linear(dist, min_size, slope):
 	print 'for the set font size, m was calculated to be %f and b calculated to be %f' % (m, b)
 	return font_size_fn
 
-def min_max_extrapolate(dist, max_size, min_size):
-    # explicitly set the indices where the min and max values can be found in
-    # the dist list. 
-    MAX = 0
-    MIN = -1
-    # y = mx+b --> max_size = m*max_freq + b, min_size = m*min_freq + b.
-    # max_size - min_size = m (max_freq - min_freq) 
-    # --> m = (max_size - min_size)/(max_freq - min_freq)
-    max_freq = float(dist[MAX][1])
-    min_freq = float(dist[MIN][1])
-    max_size = float(max_size)
-    min_size = float(min_size)
-    # if they're all the same frequency, everything is the same size. use the
-    # mid-point between max_size and min_size (it's still built as a function 
-    # so we can use it easily in place of a dynamic value). 
-    if max_freq == min_freq:
-        font_size_fn = lambda freq: (max_size + min_size)/2.0
-    else:
-        m = (max_size - min_size)/(max_freq - min_freq)
-        b = max_size - m*max_freq
-        font_size_fn = lambda freq: m*freq+b
+def tag_cloud(dist, css_id = "", css_class = "", width=800, height=600, 
+		max_words = None, start_color=None, end_color=None, 
+		color_steps=None, sort_order="random", equn="linear", slope=0.15, 
+		link_prefix=None):
 
-    print 'for the set font size, m was calculated to be %f and b calculated to be %f' % (m, b)
-    return font_size_fn
-
-def tag_cloud(dist, id_ = "", class_ = "", width=None, height=None, 
-		slope=0.15, max_words = None, start_color=None, end_color=None, 
-		color_steps=None, sort_order="random", equn="linear"):
 	''' returns a dict with style and body elements. style contains
 	defalt styling for the tag cloud, while body contains the html
 	markup. '''
@@ -352,6 +339,9 @@ def tag_cloud(dist, id_ = "", class_ = "", width=None, height=None,
 	# different frequency words. actual font sizes are computed with javascript
 	# to dynamically fit the words into the specified area. 
 
+	# get the equation of the line AFTER truncating to max_words and BEFORE
+	# shuffling the order around.  
+
 	if equn == "log":
 		# shifting the logarithm up by 1 gives a word of frequency one size one. 
 		font_size_fn = lambda freq: 10*math.log(freq,2) + 1
@@ -360,44 +350,23 @@ def tag_cloud(dist, id_ = "", class_ = "", width=None, height=None,
 	else: # linear
 		min_size = 1
 		font_size_fn = extrapolate_linear(dist, min_size, slope)
-		#font_size_fn = min_max_extrapolate(dist, max_size, min_size)
-
-	if not width:
-		print "setting default width" 
-		width = 800
-	if not height:
-		print "setting default height"
-		height = 600
-
-	# get the equation of the line AFTER truncating to max_words and BEFORE
-	# shuffling the order around.  
 
 	# determine the sort order. if the sort order is frequency, there's nothing
 	# to do since the distribution object is already sorted by frequency. 
-	if not sort_order in ['random', 'frequency', 'alphabetical']:
-		print 'invalid sort order; using default = random'
-		sort_order = 'random'
-
-	print "printing dist ..."
-	print dist
 	if sort_order == 'random': 
 		# shuffles in place
-		print "about to call shuffle"
 		random.shuffle(dist)
-		print "called shuffle"
-
 	if sort_order == 'alphabetical':
-		# not yet implemented 
-		pass
+		dist.sort()
 
 	# assemble the class and id tags for the tag cloud's wrapping div 
 	divstyle = '''id="tagcloud"'''
-	if class_ != "": 
+	if css_class != "": 
 		divstyle = divstyle[:-1] + " " + class_ + ''' "'''
 
 	# the user can specify a unique id for the tag cloud if they want
 	# additional styling applied from their own style sheets. 
-	if id_ != "": divstyle += ''' id="%s" ''' % id_
+	if css_id != "": divstyle += ''' id="%s" ''' % id_
 	divstyle = divstyle.strip()	  
 
 	body = '''<div %s>''' % divstyle
@@ -536,20 +505,28 @@ class TagCloudBaseHandler(GeneralHandler):
 	''' assumes body will be a blob of text, not a url. still has option to
 	strip existing html. ''' 
 	allowed_methods = ('GET', 'POST')
-	#args_required = ['body']
+	# optional args supported by all tag cloud types. required args are
+	# specified by the specific child classes. 
 	args_optional = ['tokenizer', 'strip', 'max_words', 'normalize', 
-		'remove_stopwords', 'sort_order',
+		'remove_stopwords', 'sort_order', 'custom_stopwords', 
 		# custom color scheme options
 		'start_color', 'end_color', 'color_steps',
 		# width and height of the div returned
 		'width', 'height', 
-		# scaling factor for linear equation
-		'slope',
 		# form of the equation from which to extrapolate relative word sizes
-		'equn']
+		# and scaling factor for linear equation
+		'slope', 'equn',
+		# user-specified css
+		'css_id', 'css_class',
+		# custom link prefix
+		'link_prefix'
+		]
 
 	def execute(self):
-		pass
+		''' default execute method. override for more specific behaviour'''
+		tokens = self.get_tokens()
+		freq = self.get_freqdist(tokens)
+		return self.get_cloud(freq)
 
 	def escape_text(self, raw_text, encoding=None):
 		if not encoding:
@@ -574,6 +551,9 @@ class TagCloudBaseHandler(GeneralHandler):
 			tokenizer_opts['remove_stopwords'] = self.kwargs['remove_stopwords']        
 		if 'normalize' in self.kwargs.keys():
 			tokenizer_opts['normalize'] = self.kwargs['normalize']        
+		if 'custom_stopwords' in self.kwargs.keys():
+			# comma-separated list in string format
+			tokenizer_opts['custom_stopwords'] = self.kwargs['custom_stopwords']   
 		tokens =  tokenize(self.get_text(), **tokenizer_opts )
 		return tokens
 
@@ -587,21 +567,27 @@ class TagCloudBaseHandler(GeneralHandler):
 			cloud_opts['width'] = self.kwargs['width']                
 		if 'height' in self.kwargs.keys():
 			cloud_opts['height'] = self.kwargs['height']                
-		if 'slope' in self.kwargs.keys():
-			cloud_opts['slope'] = self.kwargs['slope']                
 		if 'max_words' in self.kwargs.keys():
 			cloud_opts['max_words'] = self.kwargs['max_words']                
-		if 'sort_order' in self.kwargs.keys():
-			cloud_opts['sort_order'] = self.kwargs['sort_order']                
-			print cloud_opts['sort_order']
 		if 'start_color' in self.kwargs.keys():
 			cloud_opts['start_color'] = self.kwargs['start_color']                
 		if 'end_color' in self.kwargs.keys():
 			cloud_opts['end_color'] = self.kwargs['end_color']                
 		if 'color_steps' in self.kwargs.keys():
 			cloud_opts['color_steps'] = self.kwargs['color_steps']                
+		if 'sort_order' in self.kwargs.keys():
+			cloud_opts['sort_order'] = self.kwargs['sort_order']                
 		if 'equn' in self.kwargs.keys():
 			cloud_opts['equn'] = self.kwargs['equn']
+		if 'slope' in self.kwargs.keys():
+			cloud_opts['slope'] = self.kwargs['slope']                
+		if 'css_id' in self.kwargs.keys():
+			cloud_opts['css_id'] = self.kwargs['css_id']  
+		if 'css_class' in self.kwargs.keys():
+			cloud_opts['css_class'] = self.kwargs['css_class'] 
+		if 'link_prefix' in self.kwargs.keys():
+			cloud_opts['link_prefix'] = self.kwargs['link_prefix']    
+
 		cloud = tag_cloud(freq, **cloud_opts)
 		return cloud
 
@@ -613,10 +599,6 @@ class TagCloudBodyHandler(TagCloudBaseHandler):
     def get_text(self):
         return self.escape_text(self.fargs[0])
 
-    def execute(self):
-        tokens = self.get_tokens()
-        freq = self.get_freqdist(tokens)
-        return self.get_cloud(freq)
 
 
 class TagCloudFileHandler(TagCloudBaseHandler):
@@ -632,11 +614,6 @@ class TagCloudFileHandler(TagCloudBaseHandler):
         for chunk in fp.chunks():
             tmp_file += chunk
         return self.escape_text(tmp_file)
-
-    def execute(self):
-        tokens = self.get_tokens()
-        freq = self.get_freqdist(tokens)
-        return self.get_cloud(freq)
 
 class TagCloudUrlHandler(TagCloudBaseHandler):
     # 'url' becomes fargs[0] in the parent class's execute() method
@@ -660,10 +637,6 @@ class TagCloudUrlHandler(TagCloudBaseHandler):
         ustring_escaped = html_unescape(ustring)
         return ustring_escaped
 
-    def execute(self):
-        tokens = self.get_tokens()
-        freq = self.get_freqdist(tokens)
-        return self.get_cloud(freq)
 
 class TagCloudFreqHandler(TagCloudBaseHandler):
     # builds the tag cloud from an already computed frequency distribution

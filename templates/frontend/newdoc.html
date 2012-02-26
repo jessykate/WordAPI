@@ -43,104 +43,79 @@ $('#id_start_color, #id_end_color').ColorPicker({
 
 {% block content %}
 
-  <div id="ingest-selector-container">
-    <a href="#" class="ingest-selector selected" onclick="selectIngest(this, '#url-ingest'); return false;">
-      <img src="/media/images/process.png">
-      <h3>
-        {{ tagcloud_form.url.label }}
-      </h3>
-      <div class="detail-text">
-        {{ tagcloud_form.url.help_text }}
-      </div>    
-    </a>
-    <a href="#" class="ingest-selector" onclick="selectIngest(this, '#file-ingest'); return false;">
-      <img src="/media/images/process.png">
-      <h3>
-        {{ tagcloud_form.file.label }}
-      </h3>
-      <div class="detail-text">
-        {{ tagcloud_form.file.help_text }}
-      </div>
-    </a>
-    <a href="#" class="ingest-selector" onclick="selectIngest(this, '#text-ingest'); return false;">
-      <img src="/media/images/process.png">
-      <h3>
-        {{ tagcloud_form.body.label }}
-      </h3>
-      <div class="detail-text">
-        {{ tagcloud_form.body.help_text }}
-      </div>
-    </a>
-  </div>
   <form class="ingest" action="" method="post" enctype="multipart/form-data"> {% csrf_token %}
-    <div id="url-ingest" class="ingest-input-container">
-      {{ tagcloud_form.url }}
-    </div>
-    <div id="file-ingest" class="ingest-input-container" style="display:none;">
-      {{ tagcloud_form.file }}
-    </div>
-    <div id="text-ingest" class="ingest-input-container" style="display:none;">
-      {{ tagcloud_form.body }} 
-    </div>
+
+	  <fieldset>
+		  <legend>Input Type</legend>
+		  <div id="ingest-selector-container">
+			  <a href="#" class="ingest-selector selected" onclick="selectIngest(this, '#url-ingest'); return false;">
+				  <img src="/media/images/process.png">
+				  <h3>
+					  {{ tagcloud_form.url.label }}
+				  </h3>
+				  <div class="detail-text">
+					  {{ tagcloud_form.url.help_text }}
+				  </div>    
+			  </a>
+			  <a href="#" class="ingest-selector" onclick="selectIngest(this, '#file-ingest'); return false;">
+				  <img src="/media/images/process.png">
+				  <h3>
+					  {{ tagcloud_form.file.label }}
+				  </h3>
+				  <div class="detail-text">
+					  {{ tagcloud_form.file.help_text }}
+				  </div>
+			  </a>
+			  <a href="#" class="ingest-selector" onclick="selectIngest(this, '#text-ingest'); return false;">
+				  <img src="/media/images/process.png">
+				  <h3>
+					  {{ tagcloud_form.body.label }}
+				  </h3>
+				  <div class="detail-text">
+					  {{ tagcloud_form.body.help_text }}
+				  </div>
+			  </a>
+		  </div>
+		  <div id="url-ingest" class="ingest-input-container">
+			  {{ tagcloud_form.url }}
+		  </div>
+		  <div id="file-ingest" class="ingest-input-container" style="display:none;">
+			  {{ tagcloud_form.file }}
+		  </div>
+		  <div id="text-ingest" class="ingest-input-container" style="display:none;">
+			  {{ tagcloud_form.body }} 
+		  </div>
+	  </fieldset>
     
 
-    <button type="submit" class="ingest-submit"><h3>Create tag cloud!</h3></button>
-  </form>
-
-<!-- The following no longer belongs on this page. Left here for reference.
-
-<div style="display: none;">
   <div class="clear"></div>
-  <div id="step">
-   <div id="step_option">
-     <div class="step_option_title">
-       Tag Cloud Size
-     </div>
-     <br>
-     <div class="step_option_input">
+  <fieldset><legend>Word Cloud Size</legend>
+	 <div class="step_option_input">
         {{ tagcloud_form.width.label }}: {{ tagcloud_form.width }}
      </div>
-     <div class="step_option_help">
+	 <div class="step_option_help">
        {{ tagcloud_form.width.help_text }}
      </div>
-     <br>
-     <div class="step_option_input">
+	 <br>
+	 <div class="step_option_input">
        {{ tagcloud_form.height.label }}: {{ tagcloud_form.height }}
      </div>
-     <div class="step_option_help">
+	 
+	 <div class="step_option_help">
        {{ tagcloud_form.height.help_text }}
      </div>
-    </div>
-    <div id="step_option">
-      <div class="step_option_title">
-        Text Size
-      </div>
-      <br>
-      <div class="step_option_input">
-         {{ tagcloud_form.max_size.label }}: {{ tagcloud_form.max_size }}
-      </div>
-      <div class="step_option_help">
-        {{ tagcloud_form.max_size.help_text }}
-      </div>
-      <br>
-      <div class="step_option_input">
-        {{ tagcloud_form.min_size.label }}: {{ tagcloud_form.min_size }}
-      </div>
-      <div class="step_option_help">
-        {{ tagcloud_form.min_size.help_text }}
-      </div>
+ </fieldset>
+
+ <fieldset><legend>Number of Words</legend>
       <div class="step_option_input">
         {{ tagcloud_form.max_words.label }}: {{ tagcloud_form.max_words }}
       </div>
       <div class="step_option_help">
         {{ tagcloud_form.max_words.help_text }}
       </div>
-      </div>
-     <div id="step_option">
-       <div class="step_option_title">
-         Text Color
-       </div>
-       <br>
+  </fieldset>
+
+  <fieldset><legend>Colors</legend>
        <div class="step_option_input">
           {{ tagcloud_form.start_color.label }}: {{ tagcloud_form.start_color }}
        </div>
@@ -161,16 +136,101 @@ $('#id_start_color, #id_end_color').ColorPicker({
        <div class="step_option_help">
          {{ tagcloud_form.color_steps.help_text }}
        </div>
-      </div>
-   </div>
-  <div id="step">
-   <div id="step_title">
-     Step 3: Create Tagcloud
-   </div>
-   <input type="submit" value="Create Tag Cloud">
-   
-  </div>
-</div>
- -->
+   </fieldset>
+
+   <fieldset><legend>Advanced formatting and word handling options</legend>
+       <div class="step_option_input">
+         {{ tagcloud_form.strip.label }}: {{ tagcloud_form.strip }}
+       </div>
+       <div class="step_option_help">
+         {{ tagcloud_form.strip.help_text }}
+	 </div>
+	 <br>
+       <div class="step_option_input">
+         {{ tagcloud_form.normalize.label }}: {{ tagcloud_form.normalize }}
+       </div>
+       <div class="step_option_help">
+         {{ tagcloud_form.normalize.help_text }}
+       </div>
+
+	 <br>
+       <div class="step_option_input">
+         {{ tagcloud_form.remove_stopwords.label }}: {{ tagcloud_form.remove_stopwords }}
+       </div>
+       <div class="step_option_help">
+         {{ tagcloud_form.remove_stopwords.help_text }}
+       </div>
+
+	 <br>
+       <div class="step_option_input">
+         {{ tagcloud_form.custom_stopwords.label }}: {{ tagcloud_form.custom_stopwords }}
+       </div>
+       <div class="step_option_help">
+         {{ tagcloud_form.custom_stopwords.help_text }}
+       </div>
+
+	 <br>
+       <div class="step_option_input">
+         {{ tagcloud_form.tokenizer.label }}: {{ tagcloud_form.tokenizer }}
+       </div>
+       <div class="step_option_help">
+         {{ tagcloud_form.tokenizer.help_text }}
+       </div>
+
+	 <br>
+       <div class="step_option_input">
+         {{ tagcloud_form.sort_order.label }}: {{ tagcloud_form.sort_order }}
+       </div>
+       <div class="step_option_help">
+         {{ tagcloud_form.sort_order.help_text }}
+       </div>
+
+	 <br>
+       <div class="step_option_input">
+         {{ tagcloud_form.equn.label }}: {{ tagcloud_form.equn }}
+       </div>
+       <div class="step_option_help">
+         {{ tagcloud_form.equn.help_text }}
+       </div>
+
+	 <br>
+       <div class="step_option_input">
+         {{ tagcloud_form.slope.label }}: {{ tagcloud_form.slope }}
+       </div>
+       <div class="step_option_help">
+         {{ tagcloud_form.slope.help_text }}
+       </div>
+
+	 <br>
+       <div class="step_option_input">
+         {{ tagcloud_form.css_id.label }}: {{ tagcloud_form.css_id }}
+       </div>
+       <div class="step_option_help">
+         {{ tagcloud_form.css_id.help_text }}
+       </div>
+
+	 <br>
+       <div class="step_option_input">
+         {{ tagcloud_form.css_class.label }}: {{ tagcloud_form.css_class }}
+       </div>
+       <div class="step_option_help">
+         {{ tagcloud_form.css_class.help_text }}
+       </div>
+
+	 <br>
+       <div class="step_option_input">
+         {{ tagcloud_form.link_prefix.label }}: {{ tagcloud_form.link_prefix }}
+       </div>
+       <div class="step_option_help">
+         {{ tagcloud_form.link_prefix.help_text }}
+       </div>
+   </fieldset>
+
+	 <br>
+	 <br>
+
+    <button type="submit" class="ingest-submit"><h3>Create Word cloud!</h3></button>
+
+</form>
 
 {% endblock %}
