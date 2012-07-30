@@ -10,6 +10,8 @@ $(document).ready(function() {
 		console.log("desired wordcloud dimensions");
 		console.log( width );
 		console.log( height );
+
+		console.log("got here");
 		
 		// set font size explicitly so we can modify it
 		tgcl.css("font-size", "10px");

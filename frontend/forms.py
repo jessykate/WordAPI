@@ -26,10 +26,13 @@ class TagCloudForm(forms.Form):
 			'css_id': 'a custom css id to include in the div for the word cloud',
 			'css_class': 'a custom css class to include for each word in the word cloud.',
 			'link_to': 'each word in the word cloud can be a link. if so, specify the link prefix here. (eg. if each word is a category, the tag cloud can link to that category page by inserting the url prefix here). specify "wordnik" to link to fun wordnik definitions.',
+			'layout': 'layout algorithm: either svg (recommended) or text',
 			}
 
 	allowed_sort_orders = [('random', 'random'), ('frequency', 'frequency'),
-			('alphabetical', 'alphabetical (not implemented)')]
+			('alphabetical', 'alphabetical')]
+
+	allowed_layouts = [('svg', 'svg'), ('text', 'text')]
 
 	body = forms.CharField(widget=forms.Textarea(attrs={'rows':'20', 'cols':60 }), help_text = help_text['body'], required=False, label="Text")
 	url =           forms.CharField(help_text = help_text['url'], required=False)
@@ -62,6 +65,8 @@ class TagCloudForm(forms.Form):
 	css_id =		forms.CharField(help_text=help_text['css_id'], required=False)
 	css_class =		forms.CharField(help_text=help_text['css_class'], required=False)
 	link_prefix	=	forms.CharField(help_text=help_text['link_to'], required=False)
+	layout =		forms.ChoiceField(help_text= help_text['layout'], required=False, 
+			choices = allowed_layouts)
 
 
 	def clean(self):

@@ -314,8 +314,32 @@ def extrapolate_linear(dist, min_size, slope):
 	print 'for the set font size, m was calculated to be %f and b calculated to be %f' % (m, b)
 	return font_size_fn
 
-def tag_cloud(dist, css_id = "", css_class = "", width=800, height=600, 
-		max_words = None, start_color=None, end_color=None, 
+def div_based_layout(divstyle, dist):
+	
+	body = '''<div %s>''' % (divstyle)
+	for word, freq in dist:
+		# each word has a class of 'word' in addition to its frequency so that
+		# the user may specify additional styling. **note**: make sure the
+		# space after the span is maintained; otherwise the spans within the
+		# div won't wrap. 
+		body += '''<div title="%d" class="word %s">%s</div> ''' % (freq, num_to_word(freq), word)
+	body += '''</div>'''
+	return body
+
+def svg_based_layout(divstyle, dist):
+	body = '''<svg %s><text>''' % (divstyle)
+	for word, freq in dist:
+		# each word has a class of 'word' in addition to its frequency so that
+		# the user may specify additional styling. **note**: make sure the
+		# space after the span is maintained; otherwise the spans within the
+		# div won't wrap. 
+		body += '''<tspan title="%d" class="word %s">%s</tspan> ''' % (freq, num_to_word(freq), word)
+	body += '''</text></svg>'''
+	return body
+
+
+def word_cloud(dist, css_id = "", css_class = "", layout = "svg", width=800, 
+		height=600, max_words = None, start_color=None, end_color=None, 
 		color_steps=None, sort_order="random", equn="linear", slope=0.15, 
 		link_prefix=None):
 
@@ -369,14 +393,11 @@ def tag_cloud(dist, css_id = "", css_class = "", width=800, height=600,
 	if css_id != "": divstyle += ''' id="%s" ''' % id_
 	divstyle = divstyle.strip()	  
 
-	body = '''<div %s>''' % divstyle
-	for word, freq in dist:
-		# each word has a class of 'word' in addition to its frequency so that
-		# the user may specify additional styling. **note**: make sure the
-		# space after the span is maintained; otherwise the spans within the
-		# div won't wrap. 
-		body += '''<div title="%d" class="word %s">%s</div> ''' % (freq, num_to_word(freq), word)
-	body += '''</div>'''
+	if layout == "svg":
+		body = svg_based_layout(divstyle, dist)
+	else:
+		body = div_based_layout(divstyle, dist)
+
 
 	if start_color and end_color and color_steps:
 		num_colors = int(color_steps)
@@ -519,7 +540,9 @@ class TagCloudBaseHandler(GeneralHandler):
 		# user-specified css
 		'css_id', 'css_class',
 		# custom link prefix
-		'link_prefix'
+		'link_prefix',
+		# layout algorithm (svg or text)
+		'layout'
 		]
 
 	def execute(self):
@@ -587,8 +610,10 @@ class TagCloudBaseHandler(GeneralHandler):
 			cloud_opts['css_class'] = self.kwargs['css_class'] 
 		if 'link_prefix' in self.kwargs.keys():
 			cloud_opts['link_prefix'] = self.kwargs['link_prefix']    
+		if 'layout' in self.kwargs.keys():
+			cloud_opts['layout'] = self.kwargs['layout']    
 
-		cloud = tag_cloud(freq, **cloud_opts)
+		cloud = word_cloud(freq, **cloud_opts)
 		return cloud
 
 class TagCloudBodyHandler(TagCloudBaseHandler):
