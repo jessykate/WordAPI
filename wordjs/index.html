@@ -1,0 +1,31 @@
+<html>
+	<head>WordJS Demo</head>
+	<style>
+		#67509 .some-class {
+			background-color: red;
+		}
+	</style>
+	<body>
+		<div id="67509">
+		<div>
+			<div class="some-class">
+				<textarea id="demotext" rows=20 cols=80></textarea>
+				<br>
+				<input id="wordcloud-demo" type="submit" value="Try It">
+			</div>
+		</div>
+		</div>
+		<div id="wordcloud">
+		</div>
+		<script type="text/javascript" src="js/vendor/jquery-1.7.2.js"></script>
+		<script type="text/javascript" src="js/vendor/underscore.js"></script>
+		<script type="text/javascript" src="js/vendor/word.js"></script>
+		<script>
+			$("#wordcloud-demo").click(function() { 
+				content = $("#demotext").val();
+				var cloud = wordcloud(content, "700px","500px");
+				$("#wordcloud").html(cloud);
+			});
+		</script>
+	</body>
+</html>

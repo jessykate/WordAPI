@@ -1,0 +1,46 @@
+wordjs:
+	unique ids need to be character strings not numbers. 
+	randomize order of words
+	colours
+	max_words
+	strip punctuation (?,-'"!()./;- etc.)
+	user specified stop words
+	return style, html separately (what if they don't want to use our stylesheet)?
+	fill in whitespace
+	make wordcloud an object not a function, let the user tweak stuff interactively. 
+	distribution of word frequnecies - spark line ish
+	remove jquery dependency? only really used as element selector
+	ensure all css is properly scoped by wordcloud id (css selectors - space vs. comma!)
+
+topicmonster
+	click handler to add selected word as stop word
+	river of news - d3. 
+
+design:
+wordjs - create wordcloud and build into page. 
+wordapi.com - use backbone to interactively build and customize the wordcloud
+topics:
+- save static
+- save dynamic
+  - define one or more sources
+- update interval
+- visualizations:
+  - river of news
+  - wordcloud
+- topic dashboard 
+  - statistics
+- forking topics
+- build classifiers
+  - available algorithms (LDA, etc.)
+
+your accounts
+- your topics
+- your wordlists (stop words, alert words)
+- alerts/reports (occurence, co-occurence, other topics, etc.)
+
+public and private topics
+- public is free
+- private for pay
+
+how is it better than hashtags on twitter?
+
